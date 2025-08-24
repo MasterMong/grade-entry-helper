@@ -941,29 +941,27 @@ function setRowCount(rowCount) {
         // Set the value
         pageSizeInput.value = rowCount;
         
-        // Try to trigger the postback using the proper ASP.NET mechanism
-        // Check if __doPostBack function exists and is callable
-        if (typeof __doPostBack === 'function') {
-            __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
+        // Find the form and submit it directly
+        // This is what __doPostBack does internally - it sets some hidden fields and submits the form
+        const form = document.getElementById('aspnetForm') || document.querySelector('form');
+        if (form) {
+            // Set the event target and argument (what __doPostBack does)
+            let eventTarget = document.getElementById('__EVENTTARGET');
+            let eventArgument = document.getElementById('__EVENTARGUMENT');
+            
+            if (eventTarget) {
+                eventTarget.value = 'ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton';
+            }
+            if (eventArgument) {
+                eventArgument.value = '';
+            }
+            
+            // Submit the form
+            form.submit();
             showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
-            return;
+        } else {
+            showNotification('Unable to find form to submit', 'error');
         }
-        
-        // If __doPostBack exists but isn't directly callable, try executing it via eval in page context
-        if (typeof __doPostBack !== 'undefined') {
-            // Create a script element to execute in the page context
-            const script = document.createElement('script');
-            script.textContent = `
-                __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
-            `;
-            document.head.appendChild(script);
-            document.head.removeChild(script);
-            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
-            return;
-        }
-        
-        // Fallback: Show error if we can't trigger the postback
-        showNotification('Unable to trigger page update. Please refresh the page and try again.', 'error');
         
     } catch (error) {
         console.error('Error setting row count:', error);
