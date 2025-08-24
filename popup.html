@@ -2,29 +2,40 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <title>ตัวช่วยกรอกคะแนน</title>
   <style>
     body {
-      width: 500px;
-      text-align: center;
+      width: 250px;
       margin: 0;
-      font-family: sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-    button {
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background-color: #f0f0f0;
+    }
+    .menu-button {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      background-color: #007BFF;
-      color: white;
+      background-color: #ffffff;
+      color: #333;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.2s;
+      text-align: left;
+      font-size: 14px;
     }
-    button:hover {
-      background-color: #0056b3;
+    .menu-button:hover {
+      background-color: #e9e9e9;
     }
   </style>
 </head>
 <body>
-  <button id="openSgs">บันทึกผลการเรียน ตลอดภาคเรียน</button>
+  <div class="menu">
+    <button id="openSgs" class="menu-button">เปิดหน้ากรอกคะแนน SGS</button>
+    <button id="showDevInfo" class="menu-button">เกี่ยวกับปลั๊กอิน</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
