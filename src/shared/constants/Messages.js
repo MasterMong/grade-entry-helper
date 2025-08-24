@@ -4,63 +4,63 @@
 
 export const MESSAGES = {
   errors: {
-    clipboardEmpty: 'Clipboard is empty',
-    clipboardApiUnavailable: 'Clipboard API not available. Make sure you\'re on HTTPS.',
-    noEnabledColumns: 'No enabled grade columns found on this page',
-    noStudentRows: 'No enabled grade input fields found',
-    noDataFound: 'No data found in clipboard',
-    invalidValue: (value, column, weight) => `Invalid value ${value} for ${column}. Must be between 0 and ${weight}.`,
+    clipboardEmpty: 'คลิปบอร์ดว่างเปล่า',
+    clipboardApiUnavailable: 'ไม่สามารถใช้งาน Clipboard API ได้ โปรดตรวจสอบว่าคุณอยู่บน HTTPS',
+    noEnabledColumns: 'ไม่พบช่องกรอกคะแนนที่เปิดใช้งานในหน้านี้',
+    noStudentRows: 'ไม่พบช่องกรอกคะแนนของนักเรียนที่เปิดใช้งาน',
+    noDataFound: 'ไม่พบข้อมูลในคลิปบอร์ด',
+    invalidValue: (value, column, weight) => `ค่า ${value} สำหรับ ${column} ไม่ถูกต้อง ต้องอยู่ระหว่าง 0 ถึง ${weight}`,
     columnMismatch: (dataColumns, enabledColumns, columnNames) => 
-      `Data has ${dataColumns} columns but found ${enabledColumns} enabled grade columns.\n\nEnabled columns: ${columnNames}\n\nPlease ensure your clipboard data matches the enabled columns.`,
+      `ข้อมูลมี ${dataColumns} คอลัมน์ แต่พบช่องกรอกคะแนนที่เปิดใช้งาน ${enabledColumns} คอลัมน์\n\nคอลัมน์ที่เปิดใช้งาน: ${columnNames}\n\nโปรดตรวจสอบว่าข้อมูลในคลิปบอร์ดของคุณตรงกับคอลัมน์ที่เปิดใช้งาน`,
     dropdownNotSelected: {
       both: 'กรุณาเลือก "รายวิชา" และ "กลุ่ม" ก่อนใช้งานปลั๊กอิน',
       subject: 'กรุณาเลือก "รายวิชา" ก่อนใช้งานปลั๊กอิน',
       section: 'กรุณาเลือก "กลุ่ม" ก่อนใช้งานปลั๊กอิน'
     },
-    pageNotFound: 'Required page elements not found',
-    extensionInitFailed: 'Extension failed to initialize'
+    pageNotFound: 'ไม่พบองค์ประกอบที่จำเป็นในหน้า',
+    extensionInitFailed: 'ส่วนขยายเริ่มต้นไม่สำเร็จ'
   },
   
   success: {
-    gradesUpdated: (count, columns) => `Successfully updated ${count} grade fields!\n\nColumns processed: ${columns}`,
-    gradesCleared: (count, columns) => `Successfully cleared ${count} grade fields!\n\nColumns cleared: ${columns}`,
-    rowCountSet: (count) => `Successfully set display to ${count} rows per page`,
-    extensionReady: (count) => `Grade Entry Helper ready! Detected ${count} enabled columns.`
+    gradesUpdated: (count, columns) => `อัปเดตคะแนน ${count} ช่องเรียบร้อยแล้ว!\n\nคอลัมน์ที่ประมวลผล: ${columns}`,
+    gradesCleared: (count, columns) => `ล้างข้อมูลคะแนน ${count} ช่องเรียบร้อยแล้ว!\n\nคอลัมน์ที่ล้าง: ${columns}`,
+    rowCountSet: (count) => `ตั้งค่าการแสดงผลเป็น ${count} แถวต่อหน้าเรียบร้อยแล้ว`,
+    extensionReady: (count) => `ตัวช่วยกรอกคะแนน พร้อมใช้งาน! ตรวจพบ ${count} คอลัมน์ที่เปิดใช้งาน`
   },
   
   info: {
-    extensionLoaded: 'Grade Entry Helper loaded. Please select a subject and group to detect grade columns.',
-    headersDetected: 'Headers detected, starting from row 2',
-    noColumnsDetected: 'No enabled grade columns detected on this page. Please make sure you have selected a subject and group, and that the page has fully loaded.',
-    detectedColumns: 'Detected Enabled Columns:\n\n',
-    clipboardDataFormat: '\n\nYour clipboard data should have columns in this exact order.'
+    extensionLoaded: 'ตัวช่วยกรอกคะแนน โหลดแล้ว กรุณาเลือกรายวิชาและกลุ่มเพื่อตรวจหาคอลัมน์คะแนน',
+    headersDetected: 'ตรวจพบหัวตาราง เริ่มต้นจากแถวที่ 2',
+    noColumnsDetected: 'ไม่พบคอลัมน์คะแนนที่เปิดใช้งานในหน้านี้ โปรดตรวจสอบว่าคุณได้เลือกรายวิชาและกลุ่มแล้ว และหน้านี้โหลดสมบูรณ์แล้ว',
+    detectedColumns: 'คอลัมน์ที่เปิดใช้งานที่ตรวจพบ:\n\n',
+    clipboardDataFormat: '\n\nข้อมูลในคลิปบอร์ดของคุณควรมีคอลัมน์ตามลำดับนี้'
   },
   
   confirmations: {
-    clearAll: (columns) => `Are you sure you want to clear all values in these columns?\n\n${columns}\n\nThis action cannot be undone.`
+    clearAll: (columns) => `คุณแน่ใจหรือไม่ว่าต้องการล้างค่าทั้งหมดในคอลัมน์เหล่านี้?\n\n${columns}\n\nการกระทำนี้ไม่สามารถย้อนกลับได้`
   },
   
   ui: {
     buttons: {
-      fillFromClipboard: 'Fill from Clipboard',
-      clearAllValues: 'Clear All Values',
-      showDetectedColumns: 'Show Detected Columns',
-      setRows: 'Set',
+      fillFromClipboard: 'กรอกข้อมูลจากคลิปบอร์ด',
+      clearAllValues: 'ล้างค่าทั้งหมด',
+      showDetectedColumns: 'แสดงคอลัมน์ที่ตรวจพบ',
+      setRows: 'ตั้งค่า',
       minimize: '−',
       close: '×'
     },
     
     labels: {
-      extensionTitle: 'Grade Entry Helper',
-      rows: 'Rows:',
-      columnsDetected: (count) => `${count} columns detected`,
+      extensionTitle: 'ตัวช่วยกรอกคะแนน',
+      rows: 'แถว:',
+      columnsDetected: (count) => `ตรวจพบ ${count} คอลัมน์`,
       statusMessages: {
-        selectFirst: 'Please select subject and group first'
+        selectFirst: 'กรุณาเลือกรายวิชาและกลุ่มก่อน'
       }
     },
     
     tooltips: {
-      miniPanel: 'Grade Entry Helper - Click to expand'
+      miniPanel: 'ตัวช่วยกรอกคะแนน - คลิกเพื่อขยาย'
     }
   }
 };
