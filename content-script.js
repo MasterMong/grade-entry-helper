@@ -948,15 +948,33 @@ function setRowCount(rowCount) {
             return;
         }
         
-        // Instead of trying to submit the form directly, let's properly call the __doPostBack function
-        // Check if __doPostBack function exists and is callable
+        // Try to call the __doPostBack function directly if it exists
         if (typeof __doPostBack === 'function') {
             __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
             showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
         } else {
-            // Fallback: Try to click the button directly
-            pageSizeButton.click();
-            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+            // Fallback 1: Try to execute the javascript from the href attribute
+            const href = pageSizeButton.getAttribute('href');
+            if (href && href.startsWith('javascript:')) {
+                // Extract the javascript code and execute it
+                const jsCode = href.substring('javascript:'.length);
+                try {
+                    // Create a script element to execute the code in the page context
+                    const script = document.createElement('script');
+                    script.textContent = jsCode;
+                    document.head.appendChild(script);
+                    document.head.removeChild(script);
+                    showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+                } catch (execError) {
+                    // Fallback 2: Try clicking the button directly
+                    pageSizeButton.click();
+                    showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+                }
+            } else {
+                // Fallback 3: Try clicking the button directly
+                pageSizeButton.click();
+                showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+            }
         }
         
     } catch (error) {
