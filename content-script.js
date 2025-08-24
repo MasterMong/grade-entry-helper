@@ -941,22 +941,32 @@ function setRowCount(rowCount) {
         // Set the value
         pageSizeInput.value = rowCount;
         
-        // Instead of clicking the element directly, we'll trigger the doPostBack function
-        // This avoids CSP issues with javascript: URLs
+        // Try to trigger the postback using the proper ASP.NET mechanism
+        // First check if __doPostBack function exists and is callable
         if (typeof __doPostBack === 'function') {
             __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
             showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
-        } else {
-            // Fallback: try to click the button if doPostBack is not available
-            const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
-            if (!pageSizeButton) {
-                showNotification('Page size button not found', 'error');
-                return;
-            }
-            
-            pageSizeButton.click();
-            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+            return;
         }
+        
+        // Alternative approach: Dispatch a custom event that mimics what would happen
+        // Create a custom event that simulates the postback
+        const event = new CustomEvent('click', {
+            bubbles: true,
+            cancelable: true
+        });
+        
+        // Find the page size button
+        const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
+        if (!pageSizeButton) {
+            showNotification('Page size button not found', 'error');
+            return;
+        }
+        
+        // Dispatch the event on the button
+        pageSizeButton.dispatchEvent(event);
+        showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+        
     } catch (error) {
         console.error('Error setting row count:', error);
         showNotification(`Error setting row count: ${error.message}`, 'error');
