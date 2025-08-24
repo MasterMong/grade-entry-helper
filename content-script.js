@@ -123,37 +123,9 @@ function detectEnabledColumns() {
         }
     }
     
-    // Method 2: Also check checkboxes in headers to identify columns with toggleable status
-    const headerCells = document.querySelectorAll('th.thc');
-    for (let cell of headerCells) {
-        const checkbox = cell.querySelector('input[type="checkbox"]');
-        if (checkbox && !checkbox.disabled && checkbox.checked) {
-            // Try to match checkbox to column name
-            const columnName = extractColumnNameFromCheckbox(checkbox.id);
-            if (columnName && !columns[columnName]) {
-                // Get display name and weight from cell
-                const links = cell.querySelectorAll('a');
-                const textContent = cell.textContent.trim();
-                
-                let displayName = columnName;
-                if (links.length > 0) {
-                    displayName = links[0].textContent.trim();
-                }
-                
-                let weight = 100;
-                const weightMatch = textContent.match(/(\d+)\s*$/);
-                if (weightMatch) {
-                    weight = parseInt(weightMatch[1]);
-                }
-                
-                columns[columnName] = {
-                    weight: weight,
-                    name: displayName,
-                    enabled: true
-                };
-            }
-        }
-    }
+    // Log detected columns for debugging
+    console.log('Grade Entry Helper: Detected columns:', columns);
+    console.log('Grade Entry Helper: Number of columns detected:', Object.keys(columns).length);
     
     return columns;
 }
