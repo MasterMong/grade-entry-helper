@@ -17,15 +17,74 @@ export class GradeEntryUI {
     this.statusDiv = null;
     this.observers = [];
   }
-  
+
   /**
    * Initialize the UI components
    */
   async initialize() {
     await this.createControlPanel();
     this.setupStatusMonitoring();
+    this.makeDraggable();
   }
-  
+
+  /**
+   * Make the control panel draggable
+   * @private
+   */
+  makeDraggable() {
+    const panel = this.panel;
+    const header = this.panel.querySelector('.sgs-control-panel-header');
+    if (!header) return;
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    const onMouseDown = (e) => {
+      isDragging = true;
+      
+      const rect = panel.getBoundingClientRect();
+      panel.style.right = 'auto';
+      panel.style.left = `${rect.left}px`;
+
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+      
+      header.style.cursor = 'move';
+      document.body.style.userSelect = 'none';
+    };
+
+    const onMouseMove = (e) => {
+      if (!isDragging) return;
+      
+      let newX = e.clientX - offsetX;
+      let newY = e.clientY - offsetY;
+
+      const maxX = window.innerWidth - panel.offsetWidth;
+      const maxY = window.innerHeight - panel.offsetHeight;
+
+      newX = Math.max(0, Math.min(newX, maxX));
+      newY = Math.max(0, Math.min(newY, maxY));
+
+      panel.style.left = `${newX}px`;
+      panel.style.top = `${newY}px`;
+    };
+    
+    const onMouseUp = () => {
+      isDragging = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      
+      header.style.cursor = 'grab';
+      document.body.style.userSelect = '';
+    };
+
+    header.addEventListener('mousedown', onMouseDown);
+    header.style.cursor = 'grab';
+  }
+
   /**
    * Create the main control panel
    * @private
@@ -84,6 +143,17 @@ export class GradeEntryUI {
     
     // Create status indicator
     this.statusDiv = this.createStatusIndicator();
+
+    // Create dev credit
+    const devCredit = DOMUtils.createElement('div', {
+        textContent: MESSAGES.ui.labels.devCredit,
+        style: `
+            font-size: 10px;
+            color: #999;
+            text-align: center;
+            margin-top: 2px;
+        `
+    });
     
     // Assemble panel
     this.panel.appendChild(minimizeButton);
@@ -92,6 +162,7 @@ export class GradeEntryUI {
     actionButtons.forEach(button => this.panel.appendChild(button));
     this.panel.appendChild(rowControl);
     this.panel.appendChild(this.statusDiv);
+    this.panel.appendChild(devCredit);
     
     // Add to document
     document.body.appendChild(this.panel);
@@ -204,20 +275,46 @@ export class GradeEntryUI {
           transform: 'translateY(-1px)',
           boxShadow: '0 4px 8px rgba(33, 150, 243, 0.4)'
         }
+      },
+      {
+        id: 'how-to-use',
+        text: MESSAGES.ui.buttons.howToUse,
+        className: 'info',
+        style: `
+          padding: 8px 12px;
+          background: linear-gradient(135deg, #00bcd4, #0097a7);
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 500;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(0, 188, 212, 0.3);
+        `,
+        hoverStyle: {
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 8px rgba(0, 188, 212, 0.4)'
+        }
       }
     ];
     
     return buttonConfigs.map(config => {
       const action = this.actions.find(a => a.id === config.id);
-      if (!action) {return null;}
       
-      return DOMUtils.createElement('button', {
+      const button = DOMUtils.createElement('button', {
         id: `sgs-${config.id}-btn`,
         textContent: config.text,
         className: `sgs-control-panel-button ${config.className}`,
         style: config.style,
         eventListeners: {
-          click: action.handler,
+          click: () => {
+            if (action) {
+              action.handler();
+            } else if (config.id === 'how-to-use') {
+              this.showDetailedInfo(MESSAGES.ui.buttons.howToUse, MESSAGES.info.howToUseContent);
+            }
+          },
           mouseenter: (e) => {
             Object.assign(e.target.style, config.hoverStyle);
           },
@@ -227,6 +324,13 @@ export class GradeEntryUI {
           }
         }
       });
+
+      if (!action && config.id !== 'how-to-use') {
+          return null;
+      }
+
+      return button;
+
     }).filter(Boolean);
   }
   

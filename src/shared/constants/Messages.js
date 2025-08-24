@@ -33,7 +33,8 @@ export const MESSAGES = {
     headersDetected: 'ตรวจพบหัวตาราง เริ่มต้นจากแถวที่ 2',
     noColumnsDetected: 'ไม่พบคอลัมน์คะแนนที่เปิดใช้งานในหน้านี้ โปรดตรวจสอบว่าคุณได้เลือกรายวิชาและกลุ่มแล้ว และหน้านี้โหลดสมบูรณ์แล้ว',
     detectedColumns: 'คอลัมน์ที่เปิดใช้งานที่ตรวจพบ:\n\n',
-    clipboardDataFormat: '\n\nข้อมูลในคลิปบอร์ดของคุณควรมีคอลัมน์ตามลำดับนี้'
+    clipboardDataFormat: '\n\nข้อมูลในคลิปบอร์ดของคุณควรมีคอลัมน์ตามลำดับนี้',
+    howToUseContent: '1. คัดลอกข้อมูลคะแนนจากโปรแกรมสเปรดชีต (เช่น Google Sheets, Excel)\n2. คอลัมน์ในชีตของคุณต้องเรียงลำดับเหมือนกับคอลัมน์ในหน้านี้\n3. คลิกปุ่ม "กรอกข้อมูลจากคลิปบอร์ด"\n4. สคริปต์จะกรอกคะแนนให้คุณโดยอัตโนมัติ'
   },
   
   confirmations: {
@@ -47,13 +48,15 @@ export const MESSAGES = {
       showDetectedColumns: 'แสดงคอลัมน์ที่ตรวจพบ',
       setRows: 'ตั้งค่า',
       minimize: '−',
-      close: '×'
+      close: '×',
+      howToUse: 'วิธีใช้งาน'
     },
     
     labels: {
       extensionTitle: 'ตัวช่วยกรอกคะแนน',
       rows: 'แถว:',
       columnsDetected: (count) => `ตรวจพบ ${count} คอลัมน์`,
+      devCredit: 'พัฒนาโดยครูมงคล',
       statusMessages: {
         selectFirst: 'กรุณาเลือกรายวิชาและกลุ่มก่อน'
       }
