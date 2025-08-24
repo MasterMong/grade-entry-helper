@@ -15,39 +15,30 @@ chrome.action.onClicked.addListener((tab) => {
 
 // Handle messages from content script to execute code in page context
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'EXECUTE_IN_PAGE') {
+  if (message.type === 'EXECUTE_POSTBACK') {
     // Use chrome.scripting API to execute code in page context (bypasses CSP)
     chrome.scripting.executeScript({
       target: { tabId: sender.tab.id },
       world: 'MAIN', // Execute in page context, not isolated content script context
-      func: (rowCount) => {
+      func: (eventTarget, eventArgument) => {
         try {
-          // Find the page size input and set its value
-          const pageSizeInput = document.querySelector('input[name="ctl00$PageContent$TblTranscriptsPagination$_PageSize"]');
-          if (pageSizeInput) {
-            pageSizeInput.value = rowCount;
-          }
-          
           // Try to call __doPostBack directly (this works in page context)
           if (typeof __doPostBack === 'function') {
-            __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
-            return { success: true, message: `Set display to ${rowCount} rows per page` };
+            __doPostBack(eventTarget, eventArgument);
+            return { success: true };
           } else {
-            // If __doPostBack doesn't exist, simulate clicking the button
-            const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
-            if (pageSizeButton) {
-              pageSizeButton.click();
-              return { success: true, message: `Set display to ${rowCount} rows per page` };
-            } else {
-              return { success: false, error: 'Page size button not found' };
-            }
+            return { success: false, error: '__doPostBack function not found in page context' };
           }
         } catch (error) {
           return { success: false, error: error.message };
         }
       },
-      args: [message.rowCount]
+      args: [message.eventTarget, message.eventArgument]
     }).then((results) => {
+      if (chrome.runtime.lastError) {
+        sendResponse({ success: false, error: chrome.runtime.lastError.message });
+        return;
+      }
       const result = results[0].result;
       sendResponse(result);
     }).catch((error) => {
