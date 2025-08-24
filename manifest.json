@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Grade Entry Helper",
+  "version": "1.0",
+  "description": "Fill grade entries from clipboard data copied from Google Sheets",
+  "permissions": [
+    "clipboardRead",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://sgs.bopp-obec.info/sgs/TblTranscripts/Edit-TblTranscripts-Table.aspx*"
+      ],
+      "js": ["content-script.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
