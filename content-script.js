@@ -941,17 +941,22 @@ function setRowCount(rowCount) {
         // Set the value
         pageSizeInput.value = rowCount;
         
-        // Find the page size button
-        const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
-        if (!pageSizeButton) {
-            showNotification('Page size button not found', 'error');
-            return;
+        // Instead of clicking the element directly, we'll trigger the doPostBack function
+        // This avoids CSP issues with javascript: URLs
+        if (typeof __doPostBack === 'function') {
+            __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
+            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+        } else {
+            // Fallback: try to click the button if doPostBack is not available
+            const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
+            if (!pageSizeButton) {
+                showNotification('Page size button not found', 'error');
+                return;
+            }
+            
+            pageSizeButton.click();
+            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
         }
-        
-        // Trigger the button click to apply the new row count
-        pageSizeButton.click();
-        
-        showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
     } catch (error) {
         console.error('Error setting row count:', error);
         showNotification(`Error setting row count: ${error.message}`, 'error');
