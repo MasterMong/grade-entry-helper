@@ -216,7 +216,7 @@ export class ClipboardHandler {
           }
         }
         
-        processedRows.values[columnName] = processedValue;
+        processedRow.values[columnName] = processedValue;
       }
       
       return processedRow;
