@@ -15,6 +15,29 @@ if (!document.createElement || !document.querySelector || !document.addEventList
     throw new Error('Required DOM APIs not available');
 }
 
+// Inject page script to handle postMessage events for __doPostBack execution
+// This runs in the page context and can access page functions like __doPostBack
+(function injectPageScript() {
+    const script = document.createElement('script');
+    script.textContent = `
+        (function() {
+            window.addEventListener('message', function(event) {
+                if (event.source !== window || !event.data.type) return;
+                
+                if (event.data.type === 'EXECUTE_DOPOSTBACK') {
+                    if (typeof __doPostBack === 'function') {
+                        __doPostBack(event.data.eventTarget, event.data.eventArgument);
+                    } else {
+                        console.warn('__doPostBack function not found in page context');
+                    }
+                }
+            });
+        })();
+    `;
+    (document.head || document.documentElement).appendChild(script);
+    script.remove();
+})();
+
 // Dynamic column detection - will be populated by scanning the page
 let ENABLED_COLUMNS = {};
 
@@ -832,14 +855,18 @@ function createControlPanel() {
     });
     
     // Event listener for set rows button
-    setRowsButton.addEventListener('click', () => {
+    setRowsButton.addEventListener('click', async () => {
         const rowCount = parseInt(rowInput.value);
         if (isNaN(rowCount) || rowCount < 1 || rowCount > 1000) {
             showNotification('Please enter a valid number between 1 and 1000', 'error');
             return;
         }
         
-        setRowCount(rowCount);
+        try {
+            await setRowCount(rowCount);
+        } catch (error) {
+            console.error('Failed to set row count:', error);
+        }
     });
     
     minimizeButton.addEventListener('mouseenter', () => {
@@ -1000,8 +1027,28 @@ function createControlPanel() {
     console.log('Grade Entry Helper: Control panel created');
 }
 
+// Use Extension API to execute script in page context (bypasses CSP)
+async function executeInPageContext(rowCount) {
+    return new Promise((resolve, reject) => {
+        // Send message to background script to execute code in page context
+        chrome.runtime.sendMessage({
+            type: 'EXECUTE_IN_PAGE',
+            rowCount: rowCount
+        }, (response) => {
+            if (chrome.runtime.lastError) {
+                reject(new Error(chrome.runtime.lastError.message));
+            } else if (response && response.success) {
+                showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+                resolve(response);
+            } else {
+                reject(new Error(response?.error || 'Unknown error'));
+            }
+        });
+    });
+}
+
 // Function to set the number of rows to display
-function setRowCount(rowCount) {
+async function setRowCount(rowCount) {
     try {
         // Find the page size input field
         const pageSizeInput = document.querySelector('input[name="ctl00$PageContent$TblTranscriptsPagination$_PageSize"]');
@@ -1020,38 +1067,89 @@ function setRowCount(rowCount) {
             return;
         }
         
-        // Try to call the __doPostBack function directly if it exists
-        if (typeof __doPostBack === 'function') {
-            __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
+        // Method 1: Use Extension API to execute script in page context
+        try {
+            await executeInPageContext(rowCount);
+            return;
+        } catch (apiError) {
+            console.log('Extension API method failed, trying fallbacks:', apiError);
+        }
+        
+        // Method 2: Try to call the __doPostBack function directly if it exists in the page context
+        if (typeof window.__doPostBack === 'function') {
+            window.__doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
             showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
         } else {
-            // Fallback 1: Try to execute the javascript from the href attribute
+            // Method 3: Use postMessage to execute __doPostBack in page context
             const href = pageSizeButton.getAttribute('href');
-            if (href && href.startsWith('javascript:')) {
-                // Extract the javascript code and execute it
-                const jsCode = href.substring('javascript:'.length);
-                try {
-                    // Create a script element to execute the code in the page context
-                    const script = document.createElement('script');
-                    script.textContent = jsCode;
-                    document.head.appendChild(script);
-                    document.head.removeChild(script);
+            if (href && href.startsWith('javascript:__doPostBack(')) {
+                // Extract the __doPostBack parameters from the href
+                const match = href.match(/javascript:__doPostBack\('([^']+)','([^']*)'\)/);
+                if (match) {
+                    // Use window.postMessage to communicate with page context
+                    window.postMessage({
+                        type: 'EXECUTE_DOPOSTBACK',
+                        eventTarget: match[1],
+                        eventArgument: match[2] || ''
+                    }, '*');
                     showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
-                } catch (execError) {
-                    // Fallback 2: Try clicking the button directly
-                    pageSizeButton.click();
-                    showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+                } else {
+                    // Method 4: Simulate form submission
+                    simulateFormSubmission(pageSizeButton, rowCount);
                 }
             } else {
-                // Fallback 3: Try clicking the button directly
-                pageSizeButton.click();
-                showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+                // Method 5: Simulate form submission
+                simulateFormSubmission(pageSizeButton, rowCount);
             }
         }
         
     } catch (error) {
         console.error('Error setting row count:', error);
         showNotification(`Error setting row count: ${error.message}`, 'error');
+    }
+}
+
+// Helper function to simulate form submission without executing inline scripts
+function simulateFormSubmission(button, rowCount) {
+    try {
+        // Try to find the form that contains this button
+        const form = button.closest('form');
+        if (form) {
+            // Create hidden inputs for __EVENTTARGET and __EVENTARGUMENT if they don't exist
+            let eventTarget = form.querySelector('input[name="__EVENTTARGET"]');
+            let eventArgument = form.querySelector('input[name="__EVENTARGUMENT"]');
+            
+            if (!eventTarget) {
+                eventTarget = document.createElement('input');
+                eventTarget.type = 'hidden';
+                eventTarget.name = '__EVENTTARGET';
+                form.appendChild(eventTarget);
+            }
+            
+            if (!eventArgument) {
+                eventArgument = document.createElement('input');
+                eventArgument.type = 'hidden';
+                eventArgument.name = '__EVENTARGUMENT';
+                form.appendChild(eventArgument);
+            }
+            
+            // Set the values for postback
+            eventTarget.value = 'ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton';
+            eventArgument.value = '';
+            
+            // Submit the form
+            form.submit();
+            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+        } else {
+            // Last resort: try clicking the button directly
+            button.click();
+            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+        }
+    } catch (error) {
+        console.error('Error in simulateFormSubmission:', error);
+        // Final fallback: try clicking the button
+        button.click();
+        showNotification(`Attempted to set display rows`, 'info');
     }
 }
 

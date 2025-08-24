@@ -6,7 +6,11 @@
   "permissions": [
     "clipboardRead",
     "activeTab",
-    "tabs"
+    "tabs",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://sgs.bopp-obec.info/*"
   ],
   "action": {
     "default_popup": "popup.html"
