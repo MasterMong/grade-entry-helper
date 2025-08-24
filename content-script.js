@@ -914,6 +914,14 @@ function createControlPanel() {
     
     // Update status with detected columns count
     const updateStatus = () => {
+        // Check if required dropdowns are selected first
+        const dropdownCheck = checkRequiredDropdowns();
+        if (!dropdownCheck.valid) {
+            statusDiv.textContent = 'Please select subject and group first';
+            statusDiv.style.color = '#f44336';
+            return;
+        }
+        
         const columns = detectEnabledColumns();
         const count = Object.keys(columns).length;
         statusDiv.textContent = `${count} columns detected`;
@@ -922,6 +930,34 @@ function createControlPanel() {
     
     updateStatus();
     panel.appendChild(statusDiv);
+    
+    // Periodically update status to reflect changes after postbacks
+    let statusUpdateInterval = setInterval(() => {
+        if (document.getElementById('grade-helper-panel')) {
+            updateStatus();
+        } else {
+            // Clean up interval if panel is removed
+            clearInterval(statusUpdateInterval);
+        }
+    }, 2000); // Update every 2 seconds
+    
+    // Also update status when dropdowns change
+    const subjectDropdown = document.getElementById('ctl00_PageContent_ClassSubjectIDFilter');
+    const sectionDropdown = document.getElementById('ctl00_PageContent_ClassSectionNoFilter');
+    
+    if (subjectDropdown) {
+        subjectDropdown.addEventListener('change', () => {
+            // Delay update to allow page to refresh
+            setTimeout(updateStatus, 1000);
+        });
+    }
+    
+    if (sectionDropdown) {
+        sectionDropdown.addEventListener('change', () => {
+            // Delay update to allow page to refresh
+            setTimeout(updateStatus, 1000);
+        });
+    }
     
     document.body.appendChild(panel);
     
@@ -992,10 +1028,11 @@ function showDetectedColumns() {
         return;
     }
     
+    // Re-detect columns to ensure we have the latest data
     const columns = detectEnabledColumns();
     
     if (Object.keys(columns).length === 0) {
-        showNotification('No enabled grade columns detected on this page.', 'info');
+        showNotification('No enabled grade columns detected on this page. Please make sure you have selected a subject and group, and that the page has fully loaded.', 'info');
         return;
     }
     
@@ -1215,14 +1252,18 @@ function initializeExtension() {
             return;
         }
         
+        // Re-detect enabled columns in case they weren't available during initial load
+        ENABLED_COLUMNS = detectEnabledColumns();
         const columnCount = Object.keys(ENABLED_COLUMNS).length;
+        
         if (columnCount > 0) {
             const columnNames = Object.values(ENABLED_COLUMNS).map(col => col.name).join(', ');
             showNotification(`Grade Entry Helper ready! Detected ${columnCount} enabled columns.`, 'success');
         } else {
-            showNotification('Grade Entry Helper loaded but no enabled grade columns detected.', 'info');
+            // If no columns detected, show a message prompting user to select dropdowns
+            showNotification('Grade Entry Helper loaded. Please select a subject and group to detect grade columns.', 'info');
         }
-    }, 1000);
+    }, 1500);
     
     console.log('Usage:');
     console.log('1. Copy grade data from Google Sheets');
