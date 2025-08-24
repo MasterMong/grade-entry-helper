@@ -180,24 +180,7 @@ async function updateManifest() {
     })
   }));
   
-  // Update web_accessible_resources paths
-  if (manifest.web_accessible_resources) {
-    manifest.web_accessible_resources = manifest.web_accessible_resources.map(resource => ({
-      ...resource,
-      resources: resource.resources.map(file => {
-        if (file.startsWith('src/')) {
-          return file.replace('src/', '');
-        }
-        return file;
-      })
-    }));
-  }
-  
-  // Add version info for production
-  if (!isDev) {
-    manifest.version = '2.0.0';
-    manifest.description += ' (Production Build)';
-  }
+  // Update web_accessible_resources paths\n  if (manifest.web_accessible_resources) {\n    manifest.web_accessible_resources = manifest.web_accessible_resources.map(resource => ({\n      ...resource,\n      resources: resource.resources.map(file => {\n        if (file.startsWith('src/')) {\n          return file.replace('src/', '');\n        }\n        return file;\n      })\n    }));\n  }\n  \n  // Update icon paths\n  if (manifest.action && manifest.action.default_icon) {\n    Object.keys(manifest.action.default_icon).forEach(size => {\n      const iconPath = manifest.action.default_icon[size];\n      if (iconPath.startsWith('icons/')) {\n        // Icon paths are already correct\n      }\n    });\n  }\n  \n  if (manifest.icons) {\n    Object.keys(manifest.icons).forEach(size => {\n      const iconPath = manifest.icons[size];\n      if (iconPath.startsWith('icons/')) {\n        // Icon paths are already correct\n      }\n    });\n  }\n  \n  // Add version info for production\n  if (!isDev) {\n    manifest.version = '2.0.0';\n    manifest.description += ' (Production Build)';\n  }
   
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
   console.log('✅ Updated manifest.json');
@@ -298,6 +281,11 @@ async function build() {
     await buildContentScripts();
     await buildSimpleScripts();
     await copyAssets();
+    
+    // Convert SVG logo to PNG icons
+    const { default: convertSvgToPng } = await import('./convert-icons.js');
+    await convertSvgToPng();
+    
     await updateManifest();
     await generateBuildInfo();
     await validateBuild();
