@@ -667,6 +667,53 @@ function createControlPanel() {
         box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);
     `;
     
+    // Create row count input and set button
+    const rowControlContainer = document.createElement('div');
+    rowControlContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px solid #e0e0e0;
+    `;
+    
+    const rowLabel = document.createElement('span');
+    rowLabel.textContent = 'Rows:';
+    rowLabel.style.cssText = `
+        font-size: 12px;
+        color: #333;
+        white-space: nowrap;
+    `;
+    
+    const rowInput = document.createElement('input');
+    rowInput.type = 'number';
+    rowInput.value = '100';
+    rowInput.min = '1';
+    rowInput.max = '1000';
+    rowInput.style.cssText = `
+        width: 60px;
+        padding: 4px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 12px;
+    `;
+    
+    const setRowsButton = document.createElement('button');
+    setRowsButton.textContent = 'Set';
+    setRowsButton.style.cssText = `
+        padding: 4px 8px;
+        background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(156, 39, 176, 0.3);
+    `;
+    
     // Create minimize button
     const minimizeButton = document.createElement('button');
     minimizeButton.textContent = '−';
@@ -801,6 +848,28 @@ function createControlPanel() {
         infoButton.style.boxShadow = '0 2px 4px rgba(33, 150, 243, 0.3)';
     });
     
+    // Add hover effect for set rows button
+    setRowsButton.addEventListener('mouseenter', () => {
+        setRowsButton.style.transform = 'translateY(-1px)';
+        setRowsButton.style.boxShadow = '0 4px 8px rgba(156, 39, 176, 0.4)';
+    });
+    
+    setRowsButton.addEventListener('mouseleave', () => {
+        setRowsButton.style.transform = 'translateY(0)';
+        setRowsButton.style.boxShadow = '0 2px 4px rgba(156, 39, 176, 0.3)';
+    });
+    
+    // Event listener for set rows button
+    setRowsButton.addEventListener('click', () => {
+        const rowCount = parseInt(rowInput.value);
+        if (isNaN(rowCount) || rowCount < 1 || rowCount > 1000) {
+            showNotification('Please enter a valid number between 1 and 1000', 'error');
+            return;
+        }
+        
+        setRowCount(rowCount);
+    });
+    
     minimizeButton.addEventListener('mouseenter', () => {
         minimizeButton.style.background = '#555';
     });
@@ -824,6 +893,12 @@ function createControlPanel() {
     panel.appendChild(fillButton);
     panel.appendChild(clearButton);
     panel.appendChild(infoButton);
+    
+    // Assemble row control elements
+    rowControlContainer.appendChild(rowLabel);
+    rowControlContainer.appendChild(rowInput);
+    rowControlContainer.appendChild(setRowsButton);
+    panel.appendChild(rowControlContainer);
     
     // Add status indicator
     const statusDiv = document.createElement('div');
@@ -851,6 +926,36 @@ function createControlPanel() {
     document.body.appendChild(panel);
     
     console.log('Grade Entry Helper: Control panel created');
+}
+
+// Function to set the number of rows to display
+function setRowCount(rowCount) {
+    try {
+        // Find the page size input field
+        const pageSizeInput = document.querySelector('input[name="ctl00$PageContent$TblTranscriptsPagination$_PageSize"]');
+        if (!pageSizeInput) {
+            showNotification('Page size input field not found', 'error');
+            return;
+        }
+        
+        // Set the value
+        pageSizeInput.value = rowCount;
+        
+        // Find the page size button
+        const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
+        if (!pageSizeButton) {
+            showNotification('Page size button not found', 'error');
+            return;
+        }
+        
+        // Trigger the button click to apply the new row count
+        pageSizeButton.click();
+        
+        showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+    } catch (error) {
+        console.error('Error setting row count:', error);
+        showNotification(`Error setting row count: ${error.message}`, 'error');
+    }
 }
 
 // Function to show detected columns info
