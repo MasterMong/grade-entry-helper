@@ -941,29 +941,22 @@ function setRowCount(rowCount) {
         // Set the value
         pageSizeInput.value = rowCount;
         
-        // Instead of trying to click the link, let's properly simulate what __doPostBack does:
-        // 1. Set the __EVENTTARGET and __EVENTARGUMENT hidden fields
-        // 2. Submit the form
-        
-        // Set the event target to tell ASP.NET which control caused the postback
-        const eventTarget = document.getElementById('__EVENTTARGET');
-        const eventArgument = document.getElementById('__EVENTARGUMENT');
-        
-        if (eventTarget) {
-            eventTarget.value = 'ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton';
+        // Find the page size button
+        const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
+        if (!pageSizeButton) {
+            showNotification('Page size button not found', 'error');
+            return;
         }
         
-        if (eventArgument) {
-            eventArgument.value = '';
-        }
-        
-        // Find and submit the form - this is what __doPostBack ultimately does
-        const form = document.forms[0] || document.getElementById('aspnetForm') || document.querySelector('form');
-        if (form) {
-            form.submit();
+        // Instead of trying to submit the form directly, let's properly call the __doPostBack function
+        // Check if __doPostBack function exists and is callable
+        if (typeof __doPostBack === 'function') {
+            __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
             showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
         } else {
-            showNotification('Unable to find form to submit', 'error');
+            // Fallback: Try to click the button directly
+            pageSizeButton.click();
+            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
         }
         
     } catch (error) {
