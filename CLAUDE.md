@@ -42,24 +42,36 @@ Grade Entry Helper is a Chrome/Edge/Firefox browser extension (Manifest V3) that
 
 ## Development Commands
 
-This is a pure browser extension with no build process. Development workflow:
+Modern ES6+ modular architecture with build system:
+
+### Build System
+```bash
+npm run build          # Production build (minified)
+npm run build:dev      # Development build (with source maps)
+npm run build:watch    # Development build with file watching
+npm run clean          # Clean build artifacts
+npm run validate       # Validate code structure and imports
+npm run lint           # Run ESLint code quality checks
+```
 
 ### Local Development
-1. Make code changes directly to source files
-2. Go to `chrome://extensions/` (or `edge://extensions/`)  
-3. Click "Reload" button for the extension
-4. Refresh the SGS page to load updated content script
+1. Install dependencies: `npm install`
+2. Make code changes in `src/` directory
+3. Build: `npm run build:dev` or `npm run build:watch`
+4. Load `dist/` folder in browser extensions page
+5. Refresh SGS page to test changes
 
 ### Installation
-1. Enable "Developer mode" in browser extensions page
-2. Click "Load unpacked" and select the project folder
-3. Extension auto-activates on `https://sgs.bopp-obec.info/sgs/TblTranscripts/Edit-TblTranscripts-Table.aspx`
+1. Run `npm run build` to create production build
+2. Enable "Developer mode" in browser extensions page
+3. Click "Load unpacked" and select the `dist/` folder
+4. Extension auto-activates on SGS pages
 
 ### Testing
-- No automated tests - manual testing required on live SGS system
-- Test with various grade column configurations (assignments, midterm, final, etc.)
-- Verify clipboard data validation with different score ranges
-- Test postback functionality across different browsers
+- Run `npm run validate` to check code structure
+- Manual testing on live SGS system required
+- Use `?debug=true` URL parameter to enable debug mode
+- Legacy functions available: `fillGradesFromClipboard()`, `clearGradeColumns()`, `showDetectedColumns()`
 
 ## Extension Permissions
 

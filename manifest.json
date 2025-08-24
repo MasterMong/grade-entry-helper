@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Grade Entry Helper",
-  "version": "1.1",
-  "description": "Fill grade entries from clipboard data copied from Google Sheets",
+  "version": "2.0.0",
+  "description": "Multi-page browser extension for streamlined grade entry and management in SGS system",
   "permissions": [
     "clipboardRead",
     "activeTab",
@@ -24,9 +24,23 @@
         "https://sgs.bopp-obec.info/sgs/TblTranscripts/Edit-TblTranscripts-Table.aspx*"
       ],
       "js": [
-        "content-script.js"
+        "src/content-scripts/grade-entry.js"
       ],
       "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/shared/constants/*.js",
+        "src/shared/ui/*.js", 
+        "src/shared/utils/*.js",
+        "src/core/*.js",
+        "src/pages/gradeEntry/*.js"
+      ],
+      "matches": [
+        "https://sgs.bopp-obec.info/*"
+      ]
     }
   ]
 }
