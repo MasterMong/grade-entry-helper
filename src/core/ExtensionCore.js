@@ -128,15 +128,16 @@ export class ExtensionCore {
       this.log(`Loading page controller for: ${this.pageType}`);
       
       const controllerMap = {
-        'grade-entry': () => import('../pages/gradeEntry/GradeEntryController.js'),
-        'student-list': () => import('../pages/studentList/StudentListController.js'),
-        'reports': () => import('../pages/reports/ReportController.js'),
-        'settings': () => import('../pages/settings/SettingsController.js')
+        'grade-entry': () => import('../pages/gradeEntry/GradeEntryController.js')
+        // Future controllers will be added here:
+        // 'student-list': () => import('../pages/studentList/StudentListController.js'),
+        // 'reports': () => import('../pages/reports/ReportController.js'),
+        // 'settings': () => import('../pages/settings/SettingsController.js')
       };
       
       const loaderFunction = controllerMap[this.pageType];
       if (!loaderFunction) {
-        throw new Error(`No controller available for page type: ${this.pageType}`);
+        throw new Error(`Controller for page type '${this.pageType}' not implemented yet`);
       }
       
       const controllerModule = await loaderFunction();

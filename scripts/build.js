@@ -51,11 +51,12 @@ function createRollupConfig(input, output) {
     input: path.resolve(rootDir, input),
     output: {
       file: path.resolve(rootDir, output),
-      format: 'iife',
-      name: 'SGSExtension',
+      format: 'es',
       sourcemap: isDev,
-      banner: `/* Grade Entry Helper v2.0.0 - Built ${new Date().toISOString()} */`
+      banner: `/* Grade Entry Helper v2.0.0 - Built ${new Date().toISOString()} */`,
+      inlineDynamicImports: true // Inline all dynamic imports into single file
     },
+    external: [], // Don't externalize any dependencies for content scripts
     plugins: [
       nodeResolve({
         browser: true,
@@ -79,7 +80,7 @@ function createRollupConfig(input, output) {
  */
 async function cleanDist() {
   try {
-    await fs.rmdir(distDir, { recursive: true });
+    await fs.rm(distDir, { recursive: true, force: true });
     console.log('📁 Cleaned dist directory');
   } catch (error) {
     // Directory might not exist, that's ok

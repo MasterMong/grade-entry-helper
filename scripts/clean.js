@@ -27,7 +27,7 @@ const filesToClean = [
 
 async function cleanDirectory(dirPath) {
   try {
-    await fs.rmdir(path.resolve(rootDir, dirPath), { recursive: true });
+    await fs.rm(path.resolve(rootDir, dirPath), { recursive: true, force: true });
     console.log(`🗑️  Removed ${dirPath}`);
   } catch (error) {
     if (error.code !== 'ENOENT') {
