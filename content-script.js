@@ -931,15 +931,79 @@ function createControlPanel() {
     updateStatus();
     panel.appendChild(statusDiv);
     
-    // Periodically update status to reflect changes after postbacks
-    let statusUpdateInterval = setInterval(() => {
-        if (document.getElementById('grade-helper-panel')) {
-            updateStatus();
-        } else {
-            // Clean up interval if panel is removed
+    // Watch for page changes to update status automatically
+    let statusUpdateInterval = null;
+    let mutationObserver = null;
+    
+    // Function to start watching for changes
+    const startWatchingForChanges = () => {
+        // Clear any existing interval
+        if (statusUpdateInterval) {
             clearInterval(statusUpdateInterval);
         }
-    }, 2000); // Update every 2 seconds
+        
+        // Periodically update status to reflect changes after postbacks
+        statusUpdateInterval = setInterval(() => {
+            if (document.getElementById('grade-helper-panel')) {
+                updateStatus();
+            } else {
+                // Clean up interval if panel is removed
+                clearInterval(statusUpdateInterval);
+                statusUpdateInterval = null;
+                if (mutationObserver) {
+                    mutationObserver.disconnect();
+                    mutationObserver = null;
+                }
+            }
+        }, 2000); // Update every 2 seconds
+        
+        // Also watch for DOM changes using MutationObserver
+        if (typeof MutationObserver !== 'undefined') {
+            mutationObserver = new MutationObserver((mutations) => {
+                // Check if any mutations involve grade table or form elements
+                let shouldUpdate = false;
+                for (let mutation of mutations) {
+                    if (mutation.type === 'childList') {
+                        // Check if any added nodes contain grade input fields
+                        for (let node of mutation.addedNodes) {
+                            if (node.nodeType === Node.ELEMENT_NODE) {
+                                if (node.querySelector && node.querySelector('input[id*="TblTranscriptsTableControlRepeater"]')) {
+                                    shouldUpdate = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (shouldUpdate) break;
+                        
+                        // Check if any removed nodes contained our panel
+                        for (let node of mutation.removedNodes) {
+                            if (node.nodeType === Node.ELEMENT_NODE) {
+                                if (node.id === 'grade-helper-panel') {
+                                    shouldUpdate = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (shouldUpdate) break;
+                    }
+                }
+                
+                if (shouldUpdate) {
+                    // Delay update slightly to allow DOM to settle
+                    setTimeout(updateStatus, 500);
+                }
+            });
+            
+            // Observe changes to the body and grade table area
+            mutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        }
+    };
+    
+    // Start watching for changes
+    startWatchingForChanges();
     
     // Also update status when dropdowns change
     const subjectDropdown = document.getElementById('ctl00_PageContent_ClassSubjectIDFilter');
