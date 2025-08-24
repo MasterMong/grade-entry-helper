@@ -18,6 +18,48 @@ if (!document.createElement || !document.querySelector || !document.addEventList
 // Dynamic column detection - will be populated by scanning the page
 let ENABLED_COLUMNS = {};
 
+// Function to check if required dropdowns are selected
+function checkRequiredDropdowns() {
+    // Get the subject and section dropdowns
+    const subjectDropdown = document.getElementById('ctl00_PageContent_ClassSubjectIDFilter');
+    const sectionDropdown = document.getElementById('ctl00_PageContent_ClassSectionNoFilter');
+    
+    // Check if both dropdowns exist
+    if (!subjectDropdown || !sectionDropdown) {
+        console.log('Required dropdowns not found on page');
+        return { valid: false, message: 'Required dropdowns not found on page' };
+    }
+    
+    // Check if subject is selected (not the default "Please select" option)
+    const subjectSelected = subjectDropdown.value && subjectDropdown.value !== '--ANY--';
+    
+    // Check if section is selected (not the default "Please select" option)
+    const sectionSelected = sectionDropdown.value && sectionDropdown.value !== '--ANY--';
+    
+    // If both are selected, return valid
+    if (subjectSelected && sectionSelected) {
+        return { valid: true };
+    }
+    
+    // If not, return appropriate message
+    if (!subjectSelected && !sectionSelected) {
+        return { 
+            valid: false, 
+            message: 'กรุณาเลือก "รายวิชา" และ "กลุ่ม" ก่อนใช้งานปลั๊กอิน' 
+        };
+    } else if (!subjectSelected) {
+        return { 
+            valid: false, 
+            message: 'กรุณาเลือก "รายวิชา" ก่อนใช้งานปลั๊กอิน' 
+        };
+    } else {
+        return { 
+            valid: false, 
+            message: 'กรุณาเลือก "กลุ่ม" ก่อนใช้งานปลั๊กอิน' 
+        };
+    }
+}
+
 // Helper function to dynamically detect ALL enabled columns from the page
 function detectEnabledColumns() {
     const columns = {};
@@ -289,6 +331,13 @@ function updateField(field, value, columnName, weight) {
 // Function to clear all values in enabled grade columns
 async function clearGradeColumns() {
     try {
+        // First, check if required dropdowns are selected
+        const dropdownCheck = checkRequiredDropdowns();
+        if (!dropdownCheck.valid) {
+            showNotification(dropdownCheck.message, 'error');
+            return;
+        }
+        
         // First, detect enabled columns
         ENABLED_COLUMNS = detectEnabledColumns();
         
@@ -362,6 +411,13 @@ async function clearGradeColumns() {
 // Main function to fill grades from clipboard
 async function fillGradesFromClipboard() {
     try {
+        // First, check if required dropdowns are selected
+        const dropdownCheck = checkRequiredDropdowns();
+        if (!dropdownCheck.valid) {
+            showNotification(dropdownCheck.message, 'error');
+            return;
+        }
+        
         // First, detect enabled columns dynamically
         ENABLED_COLUMNS = detectEnabledColumns();
         
@@ -799,6 +855,13 @@ function createControlPanel() {
 
 // Function to show detected columns info
 function showDetectedColumns() {
+    // First, check if required dropdowns are selected
+    const dropdownCheck = checkRequiredDropdowns();
+    if (!dropdownCheck.valid) {
+        showNotification(dropdownCheck.message, 'error');
+        return;
+    }
+    
     const columns = detectEnabledColumns();
     
     if (Object.keys(columns).length === 0) {
@@ -1015,6 +1078,13 @@ function initializeExtension() {
     
     // Show initialization notification with detected columns
     setTimeout(() => {
+        // Check if required dropdowns are selected
+        const dropdownCheck = checkRequiredDropdowns();
+        if (!dropdownCheck.valid) {
+            showNotification(dropdownCheck.message, 'info');
+            return;
+        }
+        
         const columnCount = Object.keys(ENABLED_COLUMNS).length;
         if (columnCount > 0) {
             const columnNames = Object.values(ENABLED_COLUMNS).map(col => col.name).join(', ');
