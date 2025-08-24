@@ -34,7 +34,7 @@ export class SGSPageDetector {
    */
   static validatePageElements(pageType) {
     const selectors = SGS_SELECTORS[pageType];
-    if (!selectors) return false;
+    if (!selectors) {return false;}
     
     switch (pageType) {
       case 'grade-entry':

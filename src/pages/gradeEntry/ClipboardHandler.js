@@ -55,7 +55,7 @@ export class ClipboardHandler {
     const lines = text.trim().split('\n');
     const data = [];
     
-    for (let line of lines) {
+    for (const line of lines) {
       if (line.trim()) {
         // Split by tabs (Google Sheets format)
         const values = line.split('\t');

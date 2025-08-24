@@ -39,7 +39,8 @@ const buildConfig = {
   },
   assets: [
     'popup.html',
-    'manifest.json'
+    'manifest.json',
+    'logo.svg'
   ]
 };
 
@@ -178,6 +179,19 @@ async function updateManifest() {
       return file;
     })
   }));
+  
+  // Update web_accessible_resources paths
+  if (manifest.web_accessible_resources) {
+    manifest.web_accessible_resources = manifest.web_accessible_resources.map(resource => ({
+      ...resource,
+      resources: resource.resources.map(file => {
+        if (file.startsWith('src/')) {
+          return file.replace('src/', '');
+        }
+        return file;
+      })
+    }));
+  }
   
   // Add version info for production
   if (!isDev) {

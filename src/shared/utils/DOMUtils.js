@@ -69,10 +69,10 @@ export class DOMUtils {
   static createElement(tagName, options = {}) {
     const element = document.createElement(tagName);
     
-    if (options.id) element.id = options.id;
-    if (options.className) element.className = options.className;
-    if (options.textContent) element.textContent = options.textContent;
-    if (options.innerHTML) element.innerHTML = options.innerHTML;
+    if (options.id) {element.id = options.id;}
+    if (options.className) {element.className = options.className;}
+    if (options.textContent) {element.textContent = options.textContent;}
+    if (options.innerHTML) {element.innerHTML = options.innerHTML;}
     
     if (options.attributes) {
       Object.entries(options.attributes).forEach(([key, value]) => {
@@ -143,7 +143,7 @@ export class DOMUtils {
    * @returns {string} Cleaned text content
    */
   static getCleanText(element) {
-    if (!element) return '';
+    if (!element) {return '';}
     
     return element.textContent
       .replace(/\s+/g, ' ') // Replace multiple whitespace with single space

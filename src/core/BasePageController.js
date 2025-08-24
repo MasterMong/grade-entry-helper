@@ -129,7 +129,7 @@ export class BasePageController {
    * @param {string} level - Log level ('info', 'warn', 'error', 'debug')
    */
   log(message, level = 'info') {
-    if (!CONFIG.debug.enabled) return;
+    if (!CONFIG.debug.enabled) {return;}
     
     const prefix = `[${this.pageType.toUpperCase()}]`;
     const timestamp = new Date().toLocaleTimeString();

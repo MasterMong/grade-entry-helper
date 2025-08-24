@@ -28,19 +28,5 @@
       ],
       "run_at": "document_end"
     }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "src/shared/constants/*.js",
-        "src/shared/ui/*.js", 
-        "src/shared/utils/*.js",
-        "src/core/*.js",
-        "src/pages/gradeEntry/*.js"
-      ],
-      "matches": [
-        "https://sgs.bopp-obec.info/*"
-      ]
-    }
   ]
 }

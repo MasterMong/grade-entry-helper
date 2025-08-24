@@ -33,7 +33,7 @@ export class ColumnDetector {
     if (firstStudentRow) {
       const inputs = firstStudentRow.querySelectorAll('input[type="text"]');
       
-      for (let input of inputs) {
+      for (const input of inputs) {
         if (!input.disabled && !input.readOnly) {
           const columnData = this.extractColumnFromInput(input);
           if (columnData) {
@@ -63,7 +63,7 @@ export class ColumnDetector {
     const inputId = input.id;
     const match = inputId.match(SGS_PATTERNS['grade-entry'].inputIdPattern);
     
-    if (!match) return null;
+    if (!match) {return null;}
     
     const columnName = match[1];
     
@@ -151,12 +151,12 @@ export class ColumnDetector {
   findHeaderForColumn(columnName) {
     const headerCells = document.querySelectorAll(SGS_SELECTORS['grade-entry'].headerCells);
     
-    for (let cell of headerCells) {
+    for (const cell of headerCells) {
       // Check if cell contains a link or text that matches column patterns
       const links = cell.querySelectorAll('a');
       
       // Try to match by link href containing column name
-      for (let link of links) {
+      for (const link of links) {
         const href = link.getAttribute('href') || '';
         if (href.includes(columnName)) {
           return cell;

@@ -106,7 +106,7 @@ export const CONFIG = {
   
   // Debug settings
   debug: {
-    enabled: process?.env?.NODE_ENV === 'development',
+    enabled: false, // Set to true for development debugging
     logLevel: 'info', // error, warn, info, debug
     showTimings: false
   }

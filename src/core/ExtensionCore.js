@@ -327,7 +327,7 @@ export class ExtensionCore {
    * @param {string} level - Log level
    */
   log(message, level = 'info') {
-    if (!CONFIG.debug.enabled) return;
+    if (!CONFIG.debug.enabled) {return;}
     
     const prefix = '[CORE]';
     const timestamp = new Date().toLocaleTimeString();

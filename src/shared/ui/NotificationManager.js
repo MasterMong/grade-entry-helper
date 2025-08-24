@@ -104,7 +104,7 @@ export class NotificationManager {
    */
   hide(id) {
     const notificationData = this.activeNotifications.get(id);
-    if (!notificationData) return;
+    if (!notificationData) {return;}
     
     const { element } = notificationData;
     

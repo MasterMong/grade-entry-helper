@@ -209,7 +209,7 @@ export class GradeEntryUI {
     
     return buttonConfigs.map(config => {
       const action = this.actions.find(a => a.id === config.id);
-      if (!action) return null;
+      if (!action) {return null;}
       
       return DOMUtils.createElement('button', {
         id: `sgs-${config.id}-btn`,
@@ -421,7 +421,7 @@ export class GradeEntryUI {
    * @param {string} type - Status type ('success', 'error', 'info')
    */
   updateStatus(message, type = 'info') {
-    if (!this.statusDiv) return;
+    if (!this.statusDiv) {return;}
     
     this.statusDiv.textContent = message;
     
@@ -612,8 +612,8 @@ export class GradeEntryUI {
       }
       
       setTimeout(() => {
-        if (popup?.parentNode) popup.remove();
-        if (backdrop?.parentNode) backdrop.remove();
+        if (popup?.parentNode) {popup.remove();}
+        if (backdrop?.parentNode) {backdrop.remove();}
       }, 300);
     }
   }
@@ -625,7 +625,7 @@ export class GradeEntryUI {
   addPopupAnimations() {
     const animationId = 'sgs-popup-animations';
     
-    if (document.getElementById(animationId)) return;
+    if (document.getElementById(animationId)) {return;}
     
     DOMUtils.addStyles(`
       @keyframes fadeIn {
@@ -660,8 +660,8 @@ export class GradeEntryUI {
    */
   destroy() {
     // Remove panels
-    if (this.panel) this.panel.remove();
-    if (this.miniPanel) this.miniPanel.remove();
+    if (this.panel) {this.panel.remove();}
+    if (this.miniPanel) {this.miniPanel.remove();}
     
     // Disconnect observers
     this.observers.forEach(observer => observer.disconnect());
@@ -672,6 +672,6 @@ export class GradeEntryUI {
     
     // Remove animations
     const animations = document.getElementById('sgs-popup-animations');
-    if (animations) animations.remove();
+    if (animations) {animations.remove();}
   }
 }

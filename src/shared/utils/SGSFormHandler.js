@@ -206,7 +206,7 @@ export class SGSFormHandler {
    * @param {string} value - Field value
    */
   triggerFieldValidation(field, value) {
-    if (!field) return;
+    if (!field) {return;}
     
     // Set the value
     field.value = value;
@@ -303,7 +303,7 @@ export class SGSFormHandler {
    */
   getFormState() {
     const form = document.querySelector(SGS_SELECTORS['grade-entry'].form);
-    if (!form) return {};
+    if (!form) {return {};}
     
     const state = {};
     
