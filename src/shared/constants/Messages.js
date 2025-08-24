@@ -4,7 +4,7 @@
 
 export const MESSAGES = {
   errors: {
-    clipboardEmpty: 'คลิปบอร์ดว่างเปล่า',
+    clipboardEmpty: 'คุณยังไม่ได้คัดลอกข้อมูลใดๆ',
     clipboardApiUnavailable: 'ไม่สามารถใช้งาน Clipboard API ได้ โปรดตรวจสอบว่าคุณอยู่บน HTTPS',
     noEnabledColumns: 'ไม่พบช่องกรอกคะแนนที่เปิดใช้งานในหน้านี้',
     noStudentRows: 'ไม่พบช่องกรอกคะแนนของนักเรียนที่เปิดใช้งาน',
@@ -25,11 +25,11 @@ export const MESSAGES = {
     gradesUpdated: (count, columns) => `อัปเดตคะแนน ${count} ช่องเรียบร้อยแล้ว!\n\nคอลัมน์ที่ประมวลผล: ${columns}`,
     gradesCleared: (count, columns) => `ล้างข้อมูลคะแนน ${count} ช่องเรียบร้อยแล้ว!\n\nคอลัมน์ที่ล้าง: ${columns}`,
     rowCountSet: (count) => `ตั้งค่าการแสดงผลเป็น ${count} แถวต่อหน้าเรียบร้อยแล้ว`,
-    extensionReady: (count) => `ตัวช่วยกรอกคะแนน พร้อมใช้งาน! ตรวจพบ ${count} คอลัมน์ที่เปิดใช้งาน`
+    extensionReady: (count) => `เครื่องมือช่วยกรอกคะแนน SGS พร้อมใช้งาน! ตรวจพบ ${count} คอลัมน์ที่เปิดใช้งาน`
   },
   
   info: {
-    extensionLoaded: 'ตัวช่วยกรอกคะแนน โหลดแล้ว กรุณาเลือกรายวิชาและกลุ่มเพื่อตรวจหาคอลัมน์คะแนน',
+    extensionLoaded: 'เครื่องมือช่วยกรอกคะแนน SGS โหลดแล้ว กรุณาเลือกรายวิชาและกลุ่มเพื่อตรวจหาคอลัมน์คะแนน',
     headersDetected: 'ตรวจพบหัวตาราง เริ่มต้นจากแถวที่ 2',
     noColumnsDetected: 'ไม่พบคอลัมน์คะแนนที่เปิดใช้งานในหน้านี้ โปรดตรวจสอบว่าคุณได้เลือกรายวิชาและกลุ่มแล้ว และหน้านี้โหลดสมบูรณ์แล้ว',
     detectedColumns: 'คอลัมน์ที่เปิดใช้งานที่ตรวจพบ:\n\n',
@@ -43,17 +43,17 @@ export const MESSAGES = {
   
   ui: {
     buttons: {
-      fillFromClipboard: 'กรอกข้อมูลจากคลิปบอร์ด',
-      clearAllValues: 'ล้างค่าทั้งหมด',
-      showDetectedColumns: 'แสดงคอลัมน์ที่ตรวจพบ',
-      setRows: 'ตั้งค่า',
+      fillFromClipboard: 'กรอกข้อมูลที่คัดลอกไว้',
+      clearAllValues: 'ลบคะแนนทั้งหมด',
+      showDetectedColumns: 'แสดงคอลัมน์ที่เปิดใช้งาน',
+      setRows: 'ตกลง',
       minimize: '−',
       close: '×',
       howToUse: 'วิธีใช้งาน'
     },
     
     labels: {
-      extensionTitle: 'ตัวช่วยกรอกคะแนน',
+      extensionTitle: 'เครื่องมือช่วยกรอกคะแนน SGS',
       rows: 'แถว:',
       columnsDetected: (count) => `ตรวจพบ ${count} คอลัมน์`,
       devCredit: 'พัฒนาโดยครูมงคล',
@@ -63,7 +63,7 @@ export const MESSAGES = {
     },
     
     tooltips: {
-      miniPanel: 'ตัวช่วยกรอกคะแนน - คลิกเพื่อขยาย'
+      miniPanel: 'เครื่องมือช่วยกรอกคะแนน SGS - คลิกเพื่อขยาย'
     }
   }
 };

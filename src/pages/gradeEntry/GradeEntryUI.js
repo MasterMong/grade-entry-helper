@@ -145,14 +145,26 @@ export class GradeEntryUI {
     this.statusDiv = this.createStatusIndicator();
 
     // Create dev credit
-    const devCredit = DOMUtils.createElement('div', {
+    const devCredit = DOMUtils.createElement('a', {
         textContent: MESSAGES.ui.labels.devCredit,
+        attributes: {
+            href: 'https://mongkon.ch',
+            target: '_blank',
+            rel: 'noopener noreferrer'
+        },
         style: `
             font-size: 10px;
             color: #999;
             text-align: center;
             margin-top: 2px;
+            text-decoration: none;
         `
+    });
+    devCredit.addEventListener('mouseenter', () => {
+        devCredit.style.textDecoration = 'underline';
+    });
+    devCredit.addEventListener('mouseleave', () => {
+        devCredit.style.textDecoration = 'none';
     });
     
     // Assemble panel
