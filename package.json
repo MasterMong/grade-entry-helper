@@ -7,6 +7,7 @@
     "build": "node scripts/build.js",
     "build:dev": "node scripts/build.js --dev",
     "build:watch": "node scripts/build.js --watch",
+    "build:deploy": "npm run build && npm run package",
     "clean": "node scripts/clean.js",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
