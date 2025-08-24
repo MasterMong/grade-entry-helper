@@ -942,30 +942,28 @@ function setRowCount(rowCount) {
         pageSizeInput.value = rowCount;
         
         // Try to trigger the postback using the proper ASP.NET mechanism
-        // First check if __doPostBack function exists and is callable
+        // Check if __doPostBack function exists and is callable
         if (typeof __doPostBack === 'function') {
             __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
             showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
             return;
         }
         
-        // Alternative approach: Dispatch a custom event that mimics what would happen
-        // Create a custom event that simulates the postback
-        const event = new CustomEvent('click', {
-            bubbles: true,
-            cancelable: true
-        });
-        
-        // Find the page size button
-        const pageSizeButton = document.getElementById('ctl00_PageContent_TblTranscriptsPagination__PageSizeButton');
-        if (!pageSizeButton) {
-            showNotification('Page size button not found', 'error');
+        // If __doPostBack exists but isn't directly callable, try executing it via eval in page context
+        if (typeof __doPostBack !== 'undefined') {
+            // Create a script element to execute in the page context
+            const script = document.createElement('script');
+            script.textContent = `
+                __doPostBack('ctl00$PageContent$TblTranscriptsPagination$_PageSizeButton', '');
+            `;
+            document.head.appendChild(script);
+            document.head.removeChild(script);
+            showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
             return;
         }
         
-        // Dispatch the event on the button
-        pageSizeButton.dispatchEvent(event);
-        showNotification(`Successfully set display to ${rowCount} rows per page`, 'success');
+        // Fallback: Show error if we can't trigger the postback
+        showNotification('Unable to trigger page update. Please refresh the page and try again.', 'error');
         
     } catch (error) {
         console.error('Error setting row count:', error);
