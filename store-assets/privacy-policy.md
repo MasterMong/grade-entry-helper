@@ -1,9 +1,9 @@
-# Privacy Policy for Grade Entry Helper
+# Privacy Policy for SGS Bot
 
 Last updated: [Current Date]
 
 ## Data Collection
-Grade Entry Helper does not collect, store, or transmit any personal data or user information to external servers.
+SGS Bot does not collect, store, or transmit any personal data or user information to external servers.
 
 ## Data Processing
 - **Clipboard Access**: Used only to read grade data from clipboard for local processing

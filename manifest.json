@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Grade Entry Helper",
+  "name": "SGS Bot",
   "version": "2.0.0",
   "description": "Multi-page browser extension for streamlined grade entry and management in SGS system",
   "permissions": [

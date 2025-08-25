@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 
-console.log('📦 Packaging Grade Entry Helper for Chrome Web Store...');
+console.log('📦 Packaging SGS Bot for Chrome Web Store...');
 
 // Ensure dist directory exists
 if (!fs.existsSync(distDir)) {

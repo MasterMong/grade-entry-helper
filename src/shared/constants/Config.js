@@ -4,7 +4,7 @@
 
 export const CONFIG = {
   // Extension metadata
-  name: 'Grade Entry Helper',
+  name: 'SGS Bot',
   version: '2.0.0',
   
   // Feature flags per page type

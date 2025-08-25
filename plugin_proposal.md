@@ -1,8 +1,8 @@
-# Grade Entry Helper Browser Extension Proposal
+# SGS Bot Browser Extension Proposal
 
 ## Executive Summary
 
-The Grade Entry Helper is a browser extension designed to streamline the grade entry process for the Student Grading System (SGS) at `sgs.bopp-obec.info`. This extension addresses the time-intensive and error-prone manual grade entry process by enabling bulk data import from spreadsheet applications, particularly Google Sheets.
+The SGS Bot is a browser extension designed to streamline the grade entry process for the Student Grading System (SGS) at `sgs.bopp-obec.info`. This extension addresses the time-intensive and error-prone manual grade entry process by enabling bulk data import from spreadsheet applications, particularly Google Sheets.
 
 ## Problem Statement
 
@@ -25,7 +25,7 @@ The Grade Entry Helper is a browser extension designed to streamline the grade e
 
 ## Solution Overview
 
-The Grade Entry Helper extension provides automated grade entry capabilities that integrate seamlessly with the existing SGS interface, transforming the grading workflow from manual entry to intelligent bulk import.
+The SGS Bot extension provides automated grade entry capabilities that integrate seamlessly with the existing SGS interface, transforming the grading workflow from manual entry to intelligent bulk import.
 
 ## Key Features
 
@@ -200,9 +200,9 @@ The Grade Entry Helper extension provides automated grade entry capabilities tha
 
 ## Conclusion
 
-The Grade Entry Helper extension represents a significant productivity improvement for educators using the SGS system. By automating the most time-intensive aspect of grade management, this tool allows teachers to focus on instruction rather than administrative tasks.
+The SGS Bot extension represents a significant productivity improvement for educators using the SGS system. By automating the most time-intensive aspect of grade management, this tool allows teachers to focus on instruction rather than administrative tasks.
 
-The extension's design philosophy emphasizes simplicity, reliability, and seamless integration with existing workflows. With minimal technical requirements and immediate benefits, the Grade Entry Helper offers a practical solution to a widespread challenge in educational technology.
+The extension's design philosophy emphasizes simplicity, reliability, and seamless integration with existing workflows. With minimal technical requirements and immediate benefits, the SGS Bot offers a practical solution to a widespread challenge in educational technology.
 
 ### Return on Investment
 For a typical teacher managing 150 students with 10 grading components:

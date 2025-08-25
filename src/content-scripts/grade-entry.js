@@ -20,11 +20,11 @@ import { createLegacyBridge } from '../legacy-bridge.js';
     }
     
     // Initialize the extension core
-    console.log('Grade Entry Helper: Starting initialization...');
+    console.log('SGS Bot: Starting initialization...');
     const success = await extensionCore.initialize();
     
     if (success) {
-      console.log('Grade Entry Helper: Initialization completed successfully');
+      console.log('SGS Bot: Initialization completed successfully');
       
       // Create legacy bridge for backward compatibility
       createLegacyBridge(extensionCore);
@@ -35,11 +35,11 @@ import { createLegacyBridge } from '../legacy-bridge.js';
         console.log('Debug mode: Extension core exposed as window.sgsExtensionCore');
       }
     } else {
-      console.log('Grade Entry Helper: Initialization failed or page not supported');
+      console.log('SGS Bot: Initialization failed or page not supported');
     }
     
   } catch (error) {
-    console.error('Grade Entry Helper: Critical initialization error:', error);
+    console.error('SGS Bot: Critical initialization error:', error);
     
     // Show user-friendly error message
     setTimeout(() => {
@@ -58,7 +58,7 @@ import { createLegacyBridge } from '../legacy-bridge.js';
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         max-width: 350px;
       `;
-      notification.textContent = 'Grade Entry Helper failed to load. Please refresh the page and try again.';
+      notification.textContent = 'SGS Bot failed to load. Please refresh the page and try again.';
       document.body.appendChild(notification);
       
       // Auto-remove after 5 seconds

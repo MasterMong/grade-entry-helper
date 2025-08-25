@@ -1,13 +1,13 @@
 # Chrome Web Store Listing
 
 ## Name
-Grade Entry Helper
+SGS Bot
 
 ## Summary (132 characters max)
 Streamlines grade entry for SGS system - bulk import grades from Google Sheets clipboard into web-based grading interface.
 
 ## Description
-**Grade Entry Helper** simplifies grade management for teachers using the Student Grading System (SGS) at sgs.bopp-obec.info.
+**SGS Bot** simplifies grade management for teachers using the Student Grading System (SGS) at sgs.bopp-obec.info.
 
 ### Key Features:
 - **Bulk Grade Import**: Copy grades from Google Sheets and paste them directly into SGS

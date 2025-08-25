@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Build Script for Grade Entry Helper Extension
+ * Build Script for SGS Bot Extension
  * Bundles ES6 modules for browser extension compatibility
  */
 
@@ -20,7 +20,7 @@ const distDir = path.join(rootDir, 'dist');
 const isDev = process.argv.includes('--dev');
 const isWatch = process.argv.includes('--watch');
 
-console.log(`🔨 Building Grade Entry Helper Extension (${isDev ? 'development' : 'production'})`);
+console.log(`🔨 Building SGS Bot Extension (${isDev ? 'development' : 'production'})`);
 
 const buildConfig = {
   contentScripts: [
@@ -54,7 +54,7 @@ function createRollupConfig(input, output) {
       file: path.resolve(rootDir, output),
       format: 'es',
       sourcemap: isDev,
-      banner: `/* Grade Entry Helper v2.0.0 - Built ${new Date().toISOString()} */`,
+      banner: `/* SGS Bot v2.0.0 - Built ${new Date().toISOString()} */`,
       inlineDynamicImports: true // Inline all dynamic imports into single file
     },
     external: [], // Don't externalize any dependencies for content scripts

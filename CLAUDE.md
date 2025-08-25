@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Grade Entry Helper is a Chrome/Edge/Firefox browser extension (Manifest V3) that streamlines grade entry for the Student Grading System (SGS) at `sgs.bopp-obec.info`. The extension enables teachers to bulk import grade data from Google Sheets clipboard into the web-based grading interface.
+SGS Bot is a Chrome/Edge/Firefox browser extension (Manifest V3) that streamlines grade entry for the Student Grading System (SGS) at `sgs.bopp-obec.info`. The extension enables teachers to bulk import grade data from Google Sheets clipboard into the web-based grading interface.
 
 ## Architecture
 

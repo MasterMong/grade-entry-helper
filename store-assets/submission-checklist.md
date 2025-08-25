@@ -22,7 +22,7 @@
   - [ ] Marquee: 1400x560px
 
 ### 4. Listing Information
-- [ ] Extension name: "Grade Entry Helper"
+- [ ] Extension name: "SGS Bot"
 - [ ] Summary (under 132 characters)
 - [ ] Detailed description
 - [ ] Category: Productivity

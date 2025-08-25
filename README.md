@@ -1,4 +1,4 @@
-# Grade Entry Helper v2.0
+# SGS Bot v2.0
 
 A modern, scalable browser extension for streamlined grade entry and management in the SGS (Student Grading System).
 
