@@ -72,7 +72,24 @@ export class DOMUtils {
     if (options.id) {element.id = options.id;}
     if (options.className) {element.className = options.className;}
     if (options.textContent) {element.textContent = options.textContent;}
-    if (options.innerHTML) {element.innerHTML = options.innerHTML;}
+    
+    // Use textContent instead of innerHTML for security
+    if (options.innerHTML) {
+      // For simple text content, use textContent
+      if (typeof options.innerHTML === 'string' && !options.innerHTML.includes('<')) {
+        element.textContent = options.innerHTML;
+      } else {
+        // For more complex content, create elements programmatically
+        // This is safer than innerHTML
+        console.warn('DOMUtils.createElement: innerHTML usage detected. Consider using textContent or creating elements programmatically for security.');
+        // Only allow innerHTML if explicitly requested with a flag
+        if (options.allowUnsafeHTML === true) {
+          element.innerHTML = options.innerHTML;
+        } else {
+          element.textContent = options.innerHTML.replace(/<[^>]*>/g, ''); // Strip HTML tags
+        }
+      }
+    }
     
     if (options.attributes) {
       Object.entries(options.attributes).forEach(([key, value]) => {

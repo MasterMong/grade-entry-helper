@@ -45,16 +45,29 @@ function createPackage(browser, zipPath, zipName) {
     }
 
     try {
-        // Create ZIP file from dist directory
-        // Change to dist directory so zip contains files at root level
-        process.chdir(distDir);
+        // Create browser-specific build directory
+        const buildDir = path.join(rootDir, `dist-${browser.toLowerCase()}`);
+        
+        // Copy dist directory to browser-specific directory
+        if (fs.existsSync(buildDir)) {
+            execSync(`rm -rf "${buildDir}"`, { stdio: 'pipe' });
+        }
+        execSync(`cp -r "${distDir}" "${buildDir}"`, { stdio: 'pipe' });
+        
+        // Create browser-specific manifest
+        createBrowserSpecificManifest(browser, buildDir);
+        
+        // Create ZIP file from browser-specific directory
+        // Change to build directory so zip contains files at root level
+        process.chdir(buildDir);
         
         // Use system zip command (cross-platform)
-        const relativePath = path.relative(distDir, zipPath);
+        const relativePath = path.relative(buildDir, zipPath);
         execSync(`zip -r "${relativePath}" .`, { stdio: 'pipe' });
         
-        // Return to root directory
+        // Clean up browser-specific directory
         process.chdir(rootDir);
+        execSync(`rm -rf "${buildDir}"`, { stdio: 'pipe' });
         
         // Get file size
         const stats = fs.statSync(zipPath);
@@ -69,6 +82,55 @@ function createPackage(browser, zipPath, zipName) {
         console.error(`❌ Failed to create ${browser} package:`, error.message);
         return false;
     }
+}
+
+function createBrowserSpecificManifest(browser, buildDir) {
+    const manifestPath = path.join(buildDir, 'manifest.json');
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    
+    if (browser === 'Firefox') {
+        // Convert to Manifest V2 for Firefox compatibility
+        manifest.manifest_version = 2;
+        
+        // Convert background service_worker to scripts
+        if (manifest.background && manifest.background.service_worker) {
+            manifest.background = {
+                scripts: [manifest.background.service_worker],
+                persistent: false
+            };
+        }
+        
+        // Convert action to browser_action (V2 syntax)
+        if (manifest.action) {
+            manifest.browser_action = manifest.action;
+            delete manifest.action;
+        }
+        
+        // Move host_permissions to permissions (V2 syntax)
+        if (manifest.host_permissions) {
+            manifest.permissions = [...(manifest.permissions || []), ...manifest.host_permissions];
+            delete manifest.host_permissions;
+        }
+        
+        // Add extension ID for Firefox
+        manifest.browser_specific_settings = {
+            gecko: {
+                id: "sgs-bot@mongkon.ch",
+                strict_min_version: "78.0"
+            }
+        };
+        
+        // Add web_accessible_resources if needed (V2 format)
+        if (manifest.web_accessible_resources) {
+            manifest.web_accessible_resources = manifest.web_accessible_resources.flatMap(resource => 
+                resource.resources || []
+            );
+        }
+    }
+    
+    // Write the modified manifest
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+    console.log(`📝 Created ${browser}-specific manifest (v${manifest.manifest_version})`);
 }
 
 // Create packages for both browsers
