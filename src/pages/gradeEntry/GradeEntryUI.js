@@ -9,14 +9,17 @@ import { DOMUtils } from '../../shared/utils/DOMUtils.js';
 import { SGS_PATTERNS } from '../../shared/constants/SGSSelectors.js';
 
 export class GradeEntryUI {
-  constructor(actions, notificationManager) {
+  constructor(actions, notificationManager, fillMode = 'row', onToggleFillMode = null) {
     this.actions = actions;
     this.notificationManager = notificationManager;
+    this.fillMode = fillMode;
+    this.onToggleFillMode = onToggleFillMode;
     this.panel = null;
     this.miniPanel = null;
     this.isMinimized = false;
     this.statusDiv = null;
     this.progressDiv = null;
+    this.fillModeBtn = null;
     this.observers = [];
   }
 
@@ -181,6 +184,11 @@ export class GradeEntryUI {
     if (navSection) this.panel.appendChild(navSection);
 
     actionButtons.forEach(button => this.panel.appendChild(button));
+
+    // Add mode toggle button
+    const fillModeToggle = this.createFillModeToggle();
+    this.panel.appendChild(fillModeToggle);
+
     this.panel.appendChild(rowControl);
     this.panel.appendChild(this.progressDiv);
     this.panel.appendChild(this.statusDiv);
@@ -464,6 +472,60 @@ export class GradeEntryUI {
     }).filter(Boolean);
   }
   
+  /**
+   * Create the fill mode toggle button
+   * @returns {HTMLElement}
+   * @private
+   */
+  createFillModeToggle() {
+    this.fillModeBtn = DOMUtils.createElement('button', {
+      style: `
+        width: 100%;
+        padding: 5px 8px;
+        background: #f5f5f5;
+        color: #555;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        text-align: left;
+        transition: all 0.15s;
+      `
+    });
+    this.updateFillModeButton(this.fillMode);
+    this.fillModeBtn.addEventListener('click', () => {
+      if (this.onToggleFillMode) this.onToggleFillMode();
+    });
+    this.fillModeBtn.addEventListener('mouseenter', () => {
+      this.fillModeBtn.style.background = '#e8e8e8';
+      this.fillModeBtn.style.borderColor = '#bbb';
+    });
+    this.fillModeBtn.addEventListener('mouseleave', () => {
+      this.fillModeBtn.style.background = '#f5f5f5';
+      this.fillModeBtn.style.borderColor = '#ddd';
+    });
+    return this.fillModeBtn;
+  }
+
+  /**
+   * Update the fill mode toggle button text/style to reflect current mode
+   * @param {string} mode - 'row' or 'id'
+   */
+  updateFillModeButton(mode) {
+    this.fillMode = mode;
+    if (!this.fillModeBtn) return;
+    if (mode === 'id') {
+      this.fillModeBtn.textContent = `\u26A1 ${MESSAGES.ui.fillMode.studentId}`;
+      this.fillModeBtn.style.borderColor = '#1976D2';
+      this.fillModeBtn.style.color = '#1976D2';
+    } else {
+      this.fillModeBtn.textContent = `\u2195 ${MESSAGES.ui.fillMode.row}`;
+      this.fillModeBtn.style.borderColor = '#ddd';
+      this.fillModeBtn.style.color = '#555';
+    }
+    this.fillModeBtn.title = MESSAGES.ui.fillMode.toggleHint;
+  }
+
   /**
    * Create row count control
    * @returns {HTMLElement} Row control container

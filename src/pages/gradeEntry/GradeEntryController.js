@@ -25,13 +25,15 @@ export class GradeEntryController extends BasePageController {
     // State
     this.enabledColumns = {};
     this.isProcessing = false;
-    
+    this.fillMode = localStorage.getItem('sgsbot_fill_mode') || 'row';
+
     // Bind methods
     this.fillFromClipboard = this.fillFromClipboard.bind(this);
     this.clearAllValues = this.clearAllValues.bind(this);
     this.showDetectedColumns = this.showDetectedColumns.bind(this);
     this.setRowCount = this.setRowCount.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
+    this.toggleFillMode = this.toggleFillMode.bind(this);
   }
   
   /**
@@ -118,7 +120,7 @@ export class GradeEntryController extends BasePageController {
     styleManager.initialize();
     
     // Create UI with actions
-    this.ui = new GradeEntryUI(this.getActions(), notificationManager);
+    this.ui = new GradeEntryUI(this.getActions(), notificationManager, this.fillMode, this.toggleFillMode);
     await this.ui.initialize();
     
     this.log('UI initialized');
@@ -180,8 +182,13 @@ export class GradeEntryController extends BasePageController {
       // Detect enabled columns
       this.enabledColumns = this.columnDetector.detectEnabledColumns(true);
 
-      // Read clipboard data first (requires user gesture context)
-      const processedData = await this.clipboardHandler.processForGradeEntry(this.enabledColumns);
+      // Read clipboard data (mode-aware)
+      let processedData;
+      if (this.fillMode === 'id') {
+        processedData = await this.clipboardHandler.processForGradeEntryById(this.enabledColumns);
+      } else {
+        processedData = await this.clipboardHandler.processForGradeEntry(this.enabledColumns);
+      }
       this.log(`Clipboard has ${processedData.totalRows} rows, ${processedData.columnNames.length} columns`);
 
       // Auto-set page size if clipboard has more rows than visible students
@@ -191,11 +198,13 @@ export class GradeEntryController extends BasePageController {
         if (triggered) return; // Wait for page reload
       }
 
-      // Auto-enable columns if clipboard has more columns than enabled
-      if (Object.keys(this.enabledColumns).length === 0 ||
-          processedData.columnNames.length > Object.keys(this.enabledColumns).length) {
-        const triggered = await this.autoEnableColumns();
-        if (triggered) return; // Wait for page reload
+      // Auto-enable columns if clipboard has more columns than enabled (row mode only)
+      if (this.fillMode !== 'id') {
+        if (Object.keys(this.enabledColumns).length === 0 ||
+            processedData.columnNames.length > Object.keys(this.enabledColumns).length) {
+          const triggered = await this.autoEnableColumns();
+          if (triggered) return; // Wait for page reload
+        }
       }
 
       if (Object.keys(this.enabledColumns).length === 0) {
@@ -205,17 +214,27 @@ export class GradeEntryController extends BasePageController {
       this.log(`Detected ${Object.keys(this.enabledColumns).length} enabled columns`);
       this.log(`Processing ${processedData.totalRows} rows of data`);
 
-      // Update grades with progress indicator
-      const updateResult = await this.fieldUpdater.updateGrades(processedData, (done, total) => {
-        this.ui?.updateProgress(done, total);
-      });
-
-      this.ui?.hideProgress();
-
-      // Show success message
+      // Update grades with progress indicator (mode-aware)
       const columnNames = Object.values(this.enabledColumns).map(col => col.displayName).join(', ');
-      const message = MESSAGES.success.gradesUpdated(updateResult.updatedCount, columnNames);
-      this.showNotification(message, 'success');
+      let updateResult;
+      if (this.fillMode === 'id') {
+        updateResult = await this.fieldUpdater.updateGradesByStudentId(processedData, (done, total) => {
+          this.ui?.updateProgress(done, total);
+        });
+        this.ui?.hideProgress();
+        if (updateResult.matchedCount === 0) {
+          throw new Error(MESSAGES.errors.noStudentsMatched);
+        }
+        const message = MESSAGES.success.gradesUpdatedById(updateResult.updatedCount, updateResult.skippedCount, columnNames);
+        this.showNotification(message, 'success');
+      } else {
+        updateResult = await this.fieldUpdater.updateGrades(processedData, (done, total) => {
+          this.ui?.updateProgress(done, total);
+        });
+        this.ui?.hideProgress();
+        const message = MESSAGES.success.gradesUpdated(updateResult.updatedCount, columnNames);
+        this.showNotification(message, 'success');
+      }
 
       this.log(`Successfully updated ${updateResult.updatedCount} grade fields`);
 
@@ -227,6 +246,16 @@ export class GradeEntryController extends BasePageController {
     }
   }
   
+  /**
+   * Toggle between row-order and student-ID-match fill modes
+   */
+  toggleFillMode() {
+    this.fillMode = this.fillMode === 'row' ? 'id' : 'row';
+    localStorage.setItem('sgsbot_fill_mode', this.fillMode);
+    this.ui?.updateFillModeButton(this.fillMode);
+    this.log(`Fill mode changed to: ${this.fillMode}`);
+  }
+
   /**
    * Clear all grade values
    */

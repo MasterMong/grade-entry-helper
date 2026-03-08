@@ -239,6 +239,75 @@ export class ClipboardHandler {
   }
   
   /**
+   * Process clipboard data for grade entry by student ID match mode
+   * First clipboard column = student number, remaining columns = grades for enabledColumns in order
+   * @param {Object} enabledColumns
+   * @returns {Promise<Object>}
+   */
+  async processForGradeEntryById(enabledColumns) {
+    const rawData = await this.readAndParseClipboard();
+    const columnNames = Object.keys(enabledColumns);
+    const expectedDataCols = columnNames.length;
+
+    if (rawData.length === 0) {
+      throw new Error(MESSAGES.errors.noDataFound);
+    }
+
+    // Detect if first row is a header (first cell is non-numeric or looks like header text)
+    const firstRow = rawData[0];
+    const firstCellIsNumeric = !isNaN(parseFloat(firstRow[0]?.trim()));
+    const dataStartRow = firstCellIsNumeric ? 0 : 1;
+    const dataRows = rawData.slice(dataStartRow);
+
+    if (dataRows.length === 0) {
+      throw new Error(MESSAGES.errors.noDataFound);
+    }
+
+    // Validate: clipboard must have exactly expectedDataCols + 1 columns (id + grades)
+    const firstDataRow = dataRows[0];
+    if (firstDataRow.length !== expectedDataCols + 1) {
+      throw new Error(
+        `โหมดจับคู่รหัส: ข้อมูลมี ${firstDataRow.length} คอลัมน์ แต่ต้องการ ${expectedDataCols + 1} คอลัมน์\n(คอลัมน์แรก = รหัสนักเรียน + ${expectedDataCols} คอลัมน์คะแนน)`
+      );
+    }
+
+    const processedRows = dataRows.map((row, index) => {
+      const studentId = row[0]?.trim() || '';
+      const values = {};
+      for (let j = 0; j < columnNames.length; j++) {
+        const rawValue = row[j + 1]; // skip first (student ID) column
+        let processedValue = null;
+        if (rawValue !== '' && rawValue !== null && rawValue !== undefined) {
+          const numValue = parseFloat(rawValue);
+          if (!isNaN(numValue)) {
+            processedValue = numValue.toFixed(CONFIG.validation.gradeScore.precision);
+          }
+        }
+        values[columnNames[j]] = processedValue;
+      }
+      return { rowIndex: index, studentId, values, originalData: row };
+    });
+
+    this.lastClipboardData = rawData;
+    this.lastParseTime = Date.now();
+
+    return {
+      columnNames,
+      enabledColumns,
+      rows: processedRows,
+      totalRows: processedRows.length,
+      hasHeaders: !firstCellIsNumeric,
+      metadata: {
+        processedAt: new Date().toISOString(),
+        originalRowCount: rawData.length,
+        dataRowCount: processedRows.length,
+        columnCount: columnNames.length,
+        mode: 'student-id'
+      }
+    };
+  }
+
+  /**
    * Get sample data format for user guidance
    * @param {Object} enabledColumns - Column configuration
    * @returns {string} Sample data format

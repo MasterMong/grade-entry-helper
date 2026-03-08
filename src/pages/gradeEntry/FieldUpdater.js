@@ -232,6 +232,97 @@ export class FieldUpdater {
   }
   
   /**
+   * Extract student number from a row index by looking at the parent table row's 4th cell
+   * @param {number} rowIndex
+   * @param {Object} enabledColumns
+   * @returns {string|null}
+   */
+  extractStudentNumberForRow(rowIndex, enabledColumns) {
+    const firstColumn = Object.keys(enabledColumns)[0];
+    if (!firstColumn) return null;
+    const fieldId = `ctl00_PageContent_TblTranscriptsTableControlRepeater_ctl${String(rowIndex).padStart(2, '0')}_${firstColumn}`;
+    const input = document.getElementById(fieldId);
+    if (!input) return null;
+    const studentRow = input.closest('td.ttc')?.closest('tr');
+    return studentRow?.querySelectorAll(':scope > td')[3]?.textContent.trim() || null;
+  }
+
+  /**
+   * Build a map of studentNumber -> { rowIndex, fields } for all visible student rows
+   * @param {Object} enabledColumns
+   * @returns {Object}
+   */
+  buildStudentNumberMap(enabledColumns) {
+    const map = {};
+    let rowIndex = 0;
+    while (rowIndex < CONFIG.performance.maxStudentRows) {
+      const fields = {};
+      let foundAny = false;
+      for (const columnName of Object.keys(enabledColumns)) {
+        const fieldId = `ctl00_PageContent_TblTranscriptsTableControlRepeater_ctl${String(rowIndex).padStart(2, '0')}_${columnName}`;
+        const field = document.getElementById(fieldId);
+        if (field && !field.disabled && !field.readOnly) {
+          fields[columnName] = field;
+          foundAny = true;
+        }
+      }
+      if (!foundAny) break;
+      const studentNumber = this.extractStudentNumberForRow(rowIndex, enabledColumns);
+      if (studentNumber) {
+        map[studentNumber] = { rowIndex, fields };
+      }
+      rowIndex++;
+    }
+    return map;
+  }
+
+  /**
+   * Update grades by matching student numbers from clipboard data
+   * @param {Object} processedData - from ClipboardHandler.processForGradeEntryById
+   * @param {Function|null} onProgress
+   * @returns {Promise<Object>}
+   */
+  async updateGradesByStudentId(processedData, onProgress = null) {
+    const { columnNames, enabledColumns, rows } = processedData;
+    const studentMap = this.buildStudentNumberMap(enabledColumns);
+    const total = rows.length;
+    let updatedCount = 0;
+    const notFound = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if (onProgress) onProgress(i + 1, total);
+
+      const student = studentMap[row.studentId];
+      if (!student) {
+        notFound.push(row.studentId);
+        continue;
+      }
+
+      for (const columnName of columnNames) {
+        const field = student.fields[columnName];
+        const value = row.values[columnName];
+        if (field && value !== null && value !== undefined && value !== '') {
+          try {
+            const success = this.updateField(field, value, columnName, enabledColumns[columnName].weight);
+            if (success) updatedCount++;
+          } catch (error) {
+            console.warn(`Failed to update ${columnName} for student ${row.studentId}:`, error);
+          }
+        }
+      }
+    }
+
+    return {
+      updatedCount,
+      skippedCount: notFound.length,
+      notFound,
+      totalRows: rows.length,
+      matchedCount: rows.length - notFound.length
+    };
+  }
+
+  /**
    * Validate that student fields exist for the given columns
    * @param {Object} enabledColumns - Column configuration
    * @returns {Object} Validation result
