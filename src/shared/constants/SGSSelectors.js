@@ -48,7 +48,7 @@ export const SGS_SELECTORS = {
 export const SGS_PATTERNS = {
   'grade-entry': {
     // URL patterns
-    urlPattern: /Edit-TblTranscripts-Table\.aspx/,
+    urlPattern: /Edit-TblTranscripts\d*-Table\.aspx/,
     
     // Input field ID patterns
     inputIdPattern: /_ctl\d+_(\w+)$/,

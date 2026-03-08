@@ -96,7 +96,7 @@ export class GradeEntryController extends BasePageController {
     
     // Initialize SGS form handler
     sgFormHandler.initialize();
-    
+
     this.log('All services initialized');
   }
   

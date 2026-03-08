@@ -252,8 +252,9 @@ export class ExtensionCore {
    * @param {string} context - Context where error occurred
    * @param {Error} error - The error object
    * @param {string} source - Source of the error (optional)
+   * @param {boolean} skipNotification - Skip showing notification (when caller already handles it)
    */
-  reportError(context, error, source = 'core') {
+  reportError(context, error, source = 'core', skipNotification = false) {
     const errorInfo = {
       context,
       message: error?.message || 'Unknown error',
@@ -262,15 +263,17 @@ export class ExtensionCore {
       timestamp: new Date().toISOString(),
       stack: error?.stack
     };
-    
+
     // Log the error
     console.error(`[EXTENSION ERROR] ${context}:`, error);
-    
-    // Show user-friendly notification
-    const notificationManager = this.getSharedService('NotificationManager');
-    if (notificationManager) {
-      const userMessage = this.getUserFriendlyErrorMessage(error);
-      notificationManager.show(userMessage, 'error');
+
+    // Show user-friendly notification (only if not already handled by caller)
+    if (!skipNotification) {
+      const notificationManager = this.getSharedService('NotificationManager');
+      if (notificationManager) {
+        const userMessage = this.getUserFriendlyErrorMessage(error);
+        notificationManager.show(userMessage, 'error', 8000);
+      }
     }
     
     // Store error for debugging (could be sent to analytics in future)

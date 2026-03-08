@@ -94,17 +94,18 @@ export class BasePageController {
    * Show notification to user
    * @param {string} message - Notification message
    * @param {string} type - Notification type ('info', 'success', 'error')
+   * @param {number} duration - Duration in ms (0 for persistent)
    */
-  showNotification(message, type = 'info') {
+  showNotification(message, type = 'info', duration) {
     const notificationManager = this.core.getSharedService('NotificationManager');
     if (notificationManager) {
-      notificationManager.show(message, type);
+      notificationManager.show(message, type, duration);
     } else {
       // Fallback: console log if notification manager not available
       console.log(`${type.toUpperCase()}: ${message}`);
     }
   }
-  
+
   /**
    * Handle errors consistently across all controllers
    * @param {string} context - Context where error occurred
@@ -112,14 +113,14 @@ export class BasePageController {
    */
   handleError(context, error) {
     const errorMessage = error?.message || 'Unknown error';
-    const fullMessage = `${context}: ${errorMessage}`;
-    
-    this.log(fullMessage, 'error');
-    this.showNotification(fullMessage, 'error');
-    
-    // Report to core for centralized error handling
+
+    this.log(`${context}: ${errorMessage}`, 'error');
+    // Show the actual error message (not a generic one) with longer duration for readability
+    this.showNotification(errorMessage, 'error', 8000);
+
+    // Report to core for logging/storage only (notification already shown above)
     if (this.core && typeof this.core.reportError === 'function') {
-      this.core.reportError(context, error, this.pageType);
+      this.core.reportError(context, error, this.pageType, true);
     }
   }
   

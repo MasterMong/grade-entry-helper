@@ -7,44 +7,15 @@ import { SGS_SELECTORS } from '../constants/SGSSelectors.js';
 import { CONFIG } from '../constants/Config.js';
 
 export class SGSFormHandler {
-  constructor() {
-    this.pageScriptInjected = false;
-  }
+  constructor() {}
   
   /**
-   * Initialize form handler and inject page script for postback support
+   * Initialize form handler
+   * Note: postMessage-based page script injection is not used because the SGS site's
+   * Content Security Policy blocks inline scripts. Postbacks are handled via
+   * chrome.scripting.executeScript (world: MAIN) in background.js, which bypasses CSP.
    */
-  initialize() {
-    if (!this.pageScriptInjected) {
-      this.injectPageScript();
-      this.pageScriptInjected = true;
-    }
-  }
-  
-  /**
-   * Inject script into page context to handle postMessage events for __doPostBack
-   * @private
-   */
-  injectPageScript() {
-    const script = document.createElement('script');
-    script.textContent = `
-      (function() {
-        window.addEventListener('message', function(event) {
-          if (event.source !== window || !event.data.type) return;
-          
-          if (event.data.type === 'EXECUTE_DOPOSTBACK') {
-            if (typeof __doPostBack === 'function') {
-              __doPostBack(event.data.eventTarget, event.data.eventArgument);
-            } else {
-              console.warn('__doPostBack function not found in page context');
-            }
-          }
-        });
-      })();
-    `;
-    (document.head || document.documentElement).appendChild(script);
-    script.remove();
-  }
+  initialize() {}
   
   /**
    * Execute ASP.NET postback with multiple fallback methods
@@ -75,19 +46,7 @@ export class SGSFormHandler {
       }
     }
     
-    // Method 3: Use postMessage to execute in page context
-    try {
-      window.postMessage({
-        type: 'EXECUTE_DOPOSTBACK',
-        eventTarget: eventTarget,
-        eventArgument: eventArgument
-      }, '*');
-      return true;
-    } catch (error) {
-      console.log('PostMessage method failed:', error);
-    }
-    
-    // Method 4: Form submission fallback
+    // Method 3: Form submission fallback
     return this.executeViaFormSubmission(eventTarget, eventArgument);
   }
   
