@@ -20,8 +20,8 @@ Extension สำหรับ Chrome / Edge / Firefox ช่วยกรอกเ
 
 ### จาก Store (แนะนำ)
 
-- [Chrome Web Store](#) *(เร็วๆ นี้)*
-- [Firefox Add-ons](#) *(เร็วๆ นี้)*
+- [Chrome Web Store](https://chromewebstore.google.com/detail/sgs-bot/egeoeopfakjgphmjldoaahileopdmlfb)
+- [Firefox Add-ons](https://addons.mozilla.org/en-GB/firefox/addon/sgs-bot/)
 
 ### Build เองจาก Source
 
@@ -119,7 +119,7 @@ npm run lint           # ตรวจสอบ code quality
 
 **1. Fork และ Clone**
 ```bash
-git clone https://github.com/<your-username>/grade-entry-helper.git
+git clone https://github.com/MasterMong/grade-entry-helper.git
 cd grade-entry-helper
 npm install
 ```
