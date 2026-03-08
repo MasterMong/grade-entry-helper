@@ -63,9 +63,15 @@ export class GradeEntryController extends BasePageController {
       
       // Initial status update
       this.updateStatus();
-      
-      // Show initial notification
-      this.showInitialNotification();
+
+      // Check for pending fill from auto-enable/auto-page-size reload
+      await this.checkPendingFill();
+
+      // Show initial notification (only if no pending fill)
+      if (!sessionStorage.getItem('_sgs_fill_shown')) {
+        this.showInitialNotification();
+      }
+      sessionStorage.removeItem('_sgs_fill_shown');
       
       this.isInitialized = true;
       this.log('Grade Entry Controller initialized successfully');
@@ -159,43 +165,62 @@ export class GradeEntryController extends BasePageController {
       this.showNotification('Another operation is in progress. Please wait.', 'warning');
       return;
     }
-    
+
     try {
       this.isProcessing = true;
       this.log('Starting fill from clipboard operation');
-      
+
       // Validate prerequisites
       const prerequisiteCheck = this.columnDetector.validatePrerequisites();
       if (!prerequisiteCheck.valid) {
         this.showNotification(prerequisiteCheck.message, 'error');
         return;
       }
-      
+
       // Detect enabled columns
       this.enabledColumns = this.columnDetector.detectEnabledColumns(true);
-      
+
+      // Read clipboard data first (requires user gesture context)
+      const processedData = await this.clipboardHandler.processForGradeEntry(this.enabledColumns);
+      this.log(`Clipboard has ${processedData.totalRows} rows, ${processedData.columnNames.length} columns`);
+
+      // Auto-set page size if clipboard has more rows than visible students
+      const visibleStudents = this.fieldUpdater.findStudentInputFields(this.enabledColumns).length;
+      if (processedData.totalRows > visibleStudents) {
+        const triggered = await this.autoSetPageSize(processedData.totalRows);
+        if (triggered) return; // Wait for page reload
+      }
+
+      // Auto-enable columns if clipboard has more columns than enabled
+      if (Object.keys(this.enabledColumns).length === 0 ||
+          processedData.columnNames.length > Object.keys(this.enabledColumns).length) {
+        const triggered = await this.autoEnableColumns();
+        if (triggered) return; // Wait for page reload
+      }
+
       if (Object.keys(this.enabledColumns).length === 0) {
         throw new Error(MESSAGES.errors.noEnabledColumns);
       }
-      
+
       this.log(`Detected ${Object.keys(this.enabledColumns).length} enabled columns`);
-      
-      // Process clipboard data
-      const processedData = await this.clipboardHandler.processForGradeEntry(this.enabledColumns);
-      
       this.log(`Processing ${processedData.totalRows} rows of data`);
-      
-      // Update grades
-      const updateResult = await this.fieldUpdater.updateGrades(processedData);
-      
+
+      // Update grades with progress indicator
+      const updateResult = await this.fieldUpdater.updateGrades(processedData, (done, total) => {
+        this.ui?.updateProgress(done, total);
+      });
+
+      this.ui?.hideProgress();
+
       // Show success message
       const columnNames = Object.values(this.enabledColumns).map(col => col.displayName).join(', ');
       const message = MESSAGES.success.gradesUpdated(updateResult.updatedCount, columnNames);
       this.showNotification(message, 'success');
-      
+
       this.log(`Successfully updated ${updateResult.updatedCount} grade fields`);
-      
+
     } catch (error) {
+      this.ui?.hideProgress();
       this.handleError('Error filling grades from clipboard', error);
     } finally {
       this.isProcessing = false;
@@ -398,6 +423,76 @@ export class GradeEntryController extends BasePageController {
     }, 1500);
   }
   
+  /**
+   * Check and resume a pending fill operation after auto page-size/column reload
+   * @private
+   */
+  async checkPendingFill() {
+    if (sessionStorage.getItem('sgsbot_pending_fill') !== '1') return;
+    sessionStorage.removeItem('sgsbot_pending_fill');
+    sessionStorage.setItem('_sgs_fill_shown', '1');
+    this.showNotification(MESSAGES.info.autoEnabledColumns, 'info', 3000);
+    setTimeout(() => this.fillFromClipboard(), 1500);
+  }
+
+  /**
+   * Auto-set page size if clipboard has more rows than visible students
+   * @param {number} neededRows - Number of rows needed
+   * @returns {Promise<boolean>} True if a reload was triggered
+   * @private
+   */
+  async autoSetPageSize(neededRows) {
+    try {
+      const pageSizeInput = document.querySelector(SGS_SELECTORS['grade-entry'].pageSize);
+      if (!pageSizeInput) return false;
+
+      const currentSize = parseInt(pageSizeInput.value) || 0;
+      if (currentSize >= neededRows) return false;
+
+      const targetSize = Math.max(100, neededRows);
+      this.showNotification(MESSAGES.info.autoPageSize(targetSize), 'info', 3000);
+      sessionStorage.setItem('sgsbot_pending_fill', '1');
+
+      const sgsFormHandler = this.core.getSharedService('SGSFormHandler');
+      await sgsFormHandler.setPageSize(targetSize);
+      return true;
+    } catch (error) {
+      this.log('autoSetPageSize failed: ' + error.message, 'warn');
+      return false;
+    }
+  }
+
+  /**
+   * Auto-enable all available unchecked column checkboxes and reload
+   * @returns {Promise<boolean>} True if a reload was triggered
+   * @private
+   */
+  async autoEnableColumns() {
+    try {
+      const unchecked = this.columnDetector.getUncheckedAvailableCheckboxes();
+      if (unchecked.length === 0) return false;
+
+      this.showNotification(MESSAGES.info.autoEnablingColumns(unchecked.length), 'info', 3000);
+
+      // Check all unchecked checkboxes in DOM without triggering individual postbacks
+      for (const { checkbox } of unchecked) {
+        checkbox.checked = true;
+      }
+
+      sessionStorage.setItem('sgsbot_pending_fill', '1');
+
+      // Trigger a single postback to apply all checkbox changes
+      const firstCheckbox = unchecked[0].checkbox;
+      const targetId = firstCheckbox.id.replace(/_/g, '$');
+      const sgsFormHandler = this.core.getSharedService('SGSFormHandler');
+      await sgsFormHandler.executePostback(targetId, '');
+      return true;
+    } catch (error) {
+      this.log('autoEnableColumns failed: ' + error.message, 'warn');
+      return false;
+    }
+  }
+
   /**
    * Get controller performance metrics
    * @returns {Object} Performance metrics

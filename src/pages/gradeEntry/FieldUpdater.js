@@ -17,27 +17,32 @@ export class FieldUpdater {
    * @param {Object} processedData - Processed data from ClipboardHandler
    * @returns {Promise<Object>} Update result with statistics
    */
-  async updateGrades(processedData) {
+  async updateGrades(processedData, onProgress = null) {
     const { columnNames, enabledColumns, rows } = processedData;
-    
+
     // Find all student input fields
     const students = this.findStudentInputFields(enabledColumns);
-    
+
     if (students.length === 0) {
       throw new Error(MESSAGES.errors.noStudentRows);
     }
-    
+
     console.log(`Field Updater: Found ${students.length} student rows with enabled fields`);
-    
+
     let updatedCount = 0;
     let errorCount = 0;
     const errors = [];
-    
+    const totalRows = Math.min(students.length, rows.length);
+
     // Process each student row
-    for (let i = 0; i < Math.min(students.length, rows.length); i++) {
+    for (let i = 0; i < totalRows; i++) {
       const student = students[i];
       const rowData = rows[i];
-      
+
+      if (onProgress) {
+        onProgress(i + 1, totalRows);
+      }
+
       console.log(`Processing student row ${i + 1}:`, rowData.originalData);
       
       // Update each column for this student

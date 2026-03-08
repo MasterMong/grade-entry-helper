@@ -88,6 +88,15 @@ export class SGSPageDetector {
   }
   
   /**
+   * Check if the current page is a forbidden/access-denied page
+   * @returns {boolean}
+   */
+  static isForbiddenPage() {
+    return window.location.href.includes('Forbidden.aspx') ||
+      !!document.querySelector('div, span, td')?.textContent?.includes('Forbidden');
+  }
+
+  /**
    * Wait for page to be ready before extension initialization
    * @param {number} timeout - Maximum wait time in ms
    * @returns {Promise<boolean>} True if page is ready
@@ -95,8 +104,14 @@ export class SGSPageDetector {
   static waitForPageReady(timeout = 10000) {
     return new Promise((resolve) => {
       const startTime = Date.now();
-      
+
       const checkReady = () => {
+        // Check for forbidden/access-denied page first
+        if (this.isForbiddenPage()) {
+          resolve('forbidden');
+          return;
+        }
+
         // Check if document is loaded
         if (document.readyState !== 'complete') {
           if (Date.now() - startTime < timeout) {
@@ -106,7 +121,7 @@ export class SGSPageDetector {
           }
           return;
         }
-        
+
         // Check if page type is detectable
         const pageType = this.detectPageType();
         if (pageType === 'unknown') {
@@ -117,10 +132,10 @@ export class SGSPageDetector {
           }
           return;
         }
-        
+
         resolve(true);
       };
-      
+
       checkReady();
     });
   }

@@ -6,6 +6,7 @@
 import { CONFIG } from '../../shared/constants/Config.js';
 import { MESSAGES } from '../../shared/constants/Messages.js';
 import { DOMUtils } from '../../shared/utils/DOMUtils.js';
+import { SGS_PATTERNS } from '../../shared/constants/SGSSelectors.js';
 
 export class GradeEntryUI {
   constructor(actions, notificationManager) {
@@ -15,6 +16,7 @@ export class GradeEntryUI {
     this.miniPanel = null;
     this.isMinimized = false;
     this.statusDiv = null;
+    this.progressDiv = null;
     this.observers = [];
   }
 
@@ -134,13 +136,19 @@ export class GradeEntryUI {
     
     // Create minimize button
     const minimizeButton = this.createMinimizeButton();
-    
+
+    // Create navigation section
+    const navSection = this.createNavigationSection();
+
     // Create action buttons
     const actionButtons = this.createActionButtons();
-    
+
     // Create row count control
     const rowControl = this.createRowCountControl();
-    
+
+    // Create progress indicator
+    this.progressDiv = this.createProgressIndicator();
+
     // Create status indicator
     this.statusDiv = this.createStatusIndicator();
 
@@ -166,13 +174,15 @@ export class GradeEntryUI {
     devCredit.addEventListener('mouseleave', () => {
         devCredit.style.textDecoration = 'none';
     });
-    
+
     // Assemble panel
     this.panel.appendChild(minimizeButton);
     this.panel.appendChild(header);
-    
+    if (navSection) this.panel.appendChild(navSection);
+
     actionButtons.forEach(button => this.panel.appendChild(button));
     this.panel.appendChild(rowControl);
+    this.panel.appendChild(this.progressDiv);
     this.panel.appendChild(this.statusDiv);
     this.panel.appendChild(devCredit);
     
@@ -182,6 +192,114 @@ export class GradeEntryUI {
     console.log('Grade Entry UI: Control panel created');
   }
   
+  /**
+   * Create page navigation section
+   * @returns {HTMLElement|null} Navigation section or null
+   * @private
+   */
+  createNavigationSection() {
+    const pages = SGS_PATTERNS['grade-entry-nav']?.pages;
+    if (!pages) return null;
+
+    const currentPath = window.location.pathname;
+
+    const container = DOMUtils.createElement('div', {
+      style: `
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #e0e0e0;
+      `
+    });
+
+    const label = DOMUtils.createElement('span', {
+      textContent: MESSAGES.ui.navigation.label,
+      style: `font-size: 11px; color: #888;`
+    });
+
+    const btnRow = DOMUtils.createElement('div', {
+      style: `display: flex; gap: 4px;`
+    });
+
+    for (const page of pages) {
+      const isActive = currentPath.includes(page.url.split('/').pop().split('?')[0]);
+      const btn = DOMUtils.createElement('button', {
+        textContent: MESSAGES.ui.navigation.pages[page.key],
+        style: `
+          flex: 1;
+          padding: 5px 4px;
+          font-size: 11px;
+          border: 1px solid ${isActive ? '#1976D2' : '#ccc'};
+          border-radius: 4px;
+          cursor: ${isActive ? 'default' : 'pointer'};
+          background: ${isActive ? '#1976D2' : '#f5f5f5'};
+          color: ${isActive ? 'white' : '#333'};
+          font-weight: ${isActive ? '600' : '400'};
+          transition: all 0.15s;
+        `
+      });
+
+      if (!isActive) {
+        btn.addEventListener('click', () => {
+          window.location.href = page.url;
+        });
+        btn.addEventListener('mouseenter', () => {
+          btn.style.background = '#e3f2fd';
+          btn.style.borderColor = '#1976D2';
+        });
+        btn.addEventListener('mouseleave', () => {
+          btn.style.background = '#f5f5f5';
+          btn.style.borderColor = '#ccc';
+        });
+      }
+
+      btnRow.appendChild(btn);
+    }
+
+    container.appendChild(label);
+    container.appendChild(btnRow);
+    return container;
+  }
+
+  /**
+   * Create progress indicator element (hidden by default)
+   * @returns {HTMLElement}
+   * @private
+   */
+  createProgressIndicator() {
+    return DOMUtils.createElement('div', {
+      style: `
+        display: none;
+        font-size: 11px;
+        color: #1976D2;
+        text-align: center;
+        padding: 4px 0;
+        font-weight: 500;
+      `
+    });
+  }
+
+  /**
+   * Update progress display
+   * @param {number} done - Rows processed
+   * @param {number} total - Total rows
+   */
+  updateProgress(done, total) {
+    if (!this.progressDiv) return;
+    this.progressDiv.style.display = 'block';
+    this.progressDiv.textContent = MESSAGES.info.fillProgress(done, total);
+  }
+
+  /**
+   * Hide progress indicator
+   */
+  hideProgress() {
+    if (!this.progressDiv) return;
+    this.progressDiv.style.display = 'none';
+    this.progressDiv.textContent = '';
+  }
+
   /**
    * Create minimize button
    * @returns {HTMLElement} Minimize button element

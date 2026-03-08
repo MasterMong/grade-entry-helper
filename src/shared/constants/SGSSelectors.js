@@ -58,13 +58,23 @@ export const SGS_PATTERNS = {
       'Check1': 'S1', 'Check2': 'S2', 'Check3': 'S3', 'Check4': 'S4', 'Check5': 'S5',
       'Check6': 'S6', 'Check7': 'S7', 'Check8': 'S8', 'Check9': 'S9', 'Check10': 'S10',
       'Check11': 'S11', 'Check12': 'S12', 'Check13': 'S13', 'Check14': 'S14', 'Check15': 'S15',
+      'Check16': 'S16', 'Check17': 'S17', 'Check18': 'S18',
       'CheckM': 'Midterm', 'CheckF': 'Final', 'CheckRG': 'ReGr', 'CheckRpG': 'RepeatGr', 'CheckR': 'Remark'
     },
-    
-    // Fields to skip during processing
-    skipFields: ['TotalPercent', 'Gr']
+
+    // Fields to skip during processing (read-only computed columns on all pages)
+    skipFields: ['TotalPercent', 'Gr', 'ScoreFinal', 'ScoreTotal', 'Midterm']
   },
   
+  // Navigation pages for grade entry variants
+  'grade-entry-nav': {
+    pages: [
+      { label: 'ตลอดภาค', url: '/sgs/TblTranscripts/Edit-TblTranscripts-Table.aspx', key: 'full' },
+      { label: 'ก่อนกลาง', url: '/sgs/TblTranscripts/Edit-TblTranscripts1-Table.aspx', key: 'pre' },
+      { label: 'หลังกลาง', url: '/sgs/TblTranscripts/Edit-TblTranscripts2-Table.aspx', key: 'post' }
+    ]
+  },
+
   'student-list': {
     urlPattern: /TblStudents\.aspx/
   },

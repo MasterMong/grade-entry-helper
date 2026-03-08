@@ -285,6 +285,27 @@ export class ColumnDetector {
   }
   
   /**
+   * Get all currently unchecked (disabled) column checkboxes in the header
+   * @returns {Array<{checkbox: HTMLInputElement, columnName: string}>}
+   */
+  getUncheckedAvailableCheckboxes() {
+    const result = [];
+    const headerCells = document.querySelectorAll(SGS_SELECTORS['grade-entry'].headerCells);
+
+    for (const cell of headerCells) {
+      const checkbox = cell.querySelector('input[type="checkbox"]');
+      if (checkbox && !checkbox.checked) {
+        const columnName = this.extractColumnNameFromCheckbox(checkbox.id);
+        if (columnName && !SGS_PATTERNS['grade-entry'].skipFields.includes(columnName)) {
+          result.push({ checkbox, columnName });
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
    * Clear cached column detection data
    */
   clearCache() {

@@ -50,6 +50,13 @@ export class ExtensionCore {
       
       // Wait for page to be ready
       const pageReady = await SGSPageDetector.waitForPageReady();
+      if (pageReady === 'forbidden') {
+        this.log('Forbidden page detected, showing notification');
+        const { NotificationManager } = await import('../shared/ui/NotificationManager.js');
+        const nm = new NotificationManager();
+        nm.show(MESSAGES.errors.pageForbidden, 'error', 8000);
+        return false;
+      }
       if (!pageReady) {
         throw new Error('Page failed to become ready within timeout');
       }

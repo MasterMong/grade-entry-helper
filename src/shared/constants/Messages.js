@@ -18,7 +18,10 @@ export const MESSAGES = {
       section: 'กรุณาเลือก "กลุ่ม" ก่อนใช้งานปลั๊กอิน'
     },
     pageNotFound: 'ไม่พบองค์ประกอบที่จำเป็นในหน้า',
-    extensionInitFailed: 'ส่วนขยายเริ่มต้นไม่สำเร็จ'
+    extensionInitFailed: 'ส่วนขยายเริ่มต้นไม่สำเร็จ',
+    pageForbidden: 'หน้านี้ยังไม่ถึงช่วงเวลาเปิดให้บันทึก หรือคุณไม่มีสิทธิ์เข้าถึงหน้านี้',
+    columnMismatchHint: (dataCount, enabledCount) =>
+      `ข้อมูลมี ${dataCount} คอลัมน์ แต่เปิดใช้งาน ${enabledCount} คอลัมน์\nกรุณาเปิดใช้งานคอลัมน์ที่ถูกต้องโดยกดที่ช่องกาเครื่องหมาย ✓ ในหัวตาราง แล้วลองใหม่อีกครั้ง`
   },
   
   success: {
@@ -30,6 +33,10 @@ export const MESSAGES = {
   
   info: {
     extensionLoaded: 'เครื่องมือช่วยกรอกคะแนน SGS โหลดแล้ว กรุณาเลือกรายวิชาและกลุ่มเพื่อตรวจหาคอลัมน์คะแนน',
+    autoEnablingColumns: (count) => `กำลังเปิดใช้งาน ${count} คอลัมน์ รอสักครู่...`,
+    autoEnabledColumns: 'เปิดใช้งานคอลัมน์เรียบร้อยแล้ว กำลังกรอกคะแนน...',
+    autoPageSize: (count) => `ตั้งค่าแสดง ${count} แถวอัตโนมัติ`,
+    fillProgress: (done, total) => `กรอกคะแนนแล้ว ${done}/${total} คน...`,
     headersDetected: 'ตรวจพบหัวตาราง เริ่มต้นจากแถวที่ 2',
     noColumnsDetected: 'ไม่พบคอลัมน์คะแนนที่เปิดใช้งานในหน้านี้ โปรดตรวจสอบว่าคุณได้เลือกรายวิชาและกลุ่มแล้ว และหน้านี้โหลดสมบูรณ์แล้ว',
     detectedColumns: 'คอลัมน์ที่เปิดใช้งานที่ตรวจพบ:\n\n',
@@ -64,6 +71,15 @@ export const MESSAGES = {
     
     tooltips: {
       miniPanel: 'เครื่องมือช่วยกรอกคะแนน SGS - คลิกเพื่อขยาย'
+    },
+
+    navigation: {
+      label: 'ไปที่หน้า:',
+      pages: {
+        full: 'ตลอดภาค',
+        pre: 'ก่อนกลาง',
+        post: 'หลังกลาง'
+      }
     }
   }
 };
