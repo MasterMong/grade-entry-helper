@@ -267,7 +267,7 @@ export class ClipboardHandler {
     const firstDataRow = dataRows[0];
     if (firstDataRow.length !== expectedDataCols + 1) {
       throw new Error(
-        `โหมดจับคู่รหัส: ข้อมูลมี ${firstDataRow.length} คอลัมน์ แต่ต้องการ ${expectedDataCols + 1} คอลัมน์\n(คอลัมน์แรก = รหัสนักเรียน + ${expectedDataCols} คอลัมน์คะแนน)`
+        `โหมดจับคู่รหัสนักเรียน: ข้อมูลมี ${firstDataRow.length} คอลัมน์ แต่ต้องการ ${expectedDataCols + 1} คอลัมน์\n(คอลัมน์แรก = รหัสนักเรียน + ${expectedDataCols} คอลัมน์คะแนน)`
       );
     }
 

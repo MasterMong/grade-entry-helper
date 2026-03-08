@@ -49,7 +49,7 @@ The extension supports all 3 grade entry pages:
 
 **src/pages/gradeEntry/GradeEntryUI.js** - Floating control panel:
 - Page navigation buttons (ตลอดภาค / ก่อนกลาง / หลังกลาง) with active page highlight
-- Fill mode toggle button (↕ เรียงแถว / ⚡ จับคู่รหัส)
+- Fill mode toggle button (↕ เรียงแถว / ⚡ จับคู่รหัสนักเรียน)
 - Progress indicator shown during fill operations
 - Draggable panel, minimize/restore states
 
