@@ -5,37 +5,112 @@
   <title>เครื่องมือช่วยกรอกคะแนน SGS</title>
   <style>
     body {
-      width: 300px;
+      width: 280px;
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #fff;
+    }
+    .header {
+      padding: 10px 14px 8px;
+      background: linear-gradient(135deg, #1976D2, #1565C0);
+      color: white;
+    }
+    .header-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .header-subtitle {
+      font-size: 11px;
+      opacity: 0.8;
+      margin: 2px 0 0;
+    }
+    .section-label {
+      padding: 6px 14px 4px;
+      font-size: 10px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #eee;
     }
     .menu {
       display: flex;
       flex-direction: column;
-      gap: 1px;
-      background-color: #f0f0f0;
     }
     .menu-button {
       width: 100%;
-      padding: 12px;
+      padding: 10px 14px;
       border: none;
-      background-color: #ffffff;
+      border-bottom: 1px solid #f0f0f0;
+      background: #fff;
       color: #333;
       cursor: pointer;
-      transition: background-color 0.2s;
       text-align: left;
-      font-size: 14px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s;
     }
     .menu-button:hover {
-      background-color: #e9e9e9;
+      background: #f0f7ff;
+      color: #1976D2;
+    }
+    .menu-button:last-child {
+      border-bottom: none;
+    }
+    .menu-button .icon {
+      font-size: 15px;
+      width: 18px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .menu-button.secondary {
+      color: #666;
+      font-size: 12px;
+    }
+    .menu-button.secondary:hover {
+      background: #f5f5f5;
+      color: #333;
+    }
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <div class="menu">
-    <button id="openSgs" class="menu-button">บันทึกผลการเรียน ตลอดภาคเรียนใน SGS</button>
-    <button id="showDevInfo" class="menu-button">เกี่ยวกับปลั๊กอิน</button>
+  <div class="header">
+    <p class="header-title">เครื่องมือช่วยกรอกคะแนน SGS</p>
+    <p class="header-subtitle">เลือกหน้าที่ต้องการเปิด</p>
   </div>
+
+  <div class="section-label">กรอกคะแนน</div>
+  <div class="menu">
+    <button id="openFull" class="menu-button">
+      <span class="icon">📋</span>
+      <span>ตลอดภาค</span>
+    </button>
+    <button id="openPre" class="menu-button">
+      <span class="icon">📝</span>
+      <span>ก่อนกลาง</span>
+    </button>
+    <button id="openPost" class="menu-button">
+      <span class="icon">✏️</span>
+      <span>หลังกลาง</span>
+    </button>
+  </div>
+
+  <div class="divider"></div>
+  <div class="menu">
+    <button id="showDevInfo" class="menu-button secondary">
+      <span class="icon">ℹ️</span>
+      <span>เกี่ยวกับปลั๊กอิน</span>
+    </button>
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
