@@ -1,210 +1,191 @@
-# SGS Bot v2.0
+# SGS Bot v2.1
 
-A modern, scalable browser extension for streamlined grade entry and management in the SGS (Student Grading System).
+Extension สำหรับ Chrome / Edge / Firefox ช่วยกรอกเกรดแบบ Bulk เข้าระบบ SGS (sgs.bopp-obec.info) โดยนำเข้าข้อมูลจาก Google Sheets ผ่าน Clipboard
 
-## 🚀 Features
+---
 
-- **Multi-page Support**: Extensible architecture supporting multiple SGS pages
-- **Smart Column Detection**: Automatically detects and adapts to any grading configuration
-- **Clipboard Integration**: Seamless data import from Google Sheets and Excel
-- **Bulk Operations**: Fill grades, clear values, and manage data efficiently
-- **Real-time Validation**: Input validation with clear error messaging
-- **Modern Architecture**: ES6+ modules, async/await, proper error handling
+## ฟีเจอร์หลัก
 
-## 📋 Supported Pages
+- **รองรับทั้ง 3 หน้ากรอกเกรด** — ตลอดภาค, ก่อนกลางภาค, หลังกลางภาค
+- **โหมดเรียงแถว** — วางข้อมูลตามลำดับแถวในหน้า
+- **โหมดจับคู่รหัสนักเรียน** — ใช้เลขประจำตัวนักเรียนจับคู่ ไม่ต้องเรียงลำดับให้ตรง
+- **ปรับจำนวนแถวอัตโนมัติ** — ขยายรายการนักเรียนให้ครบก่อนกรอก
+- **เปิดคอลัมน์อัตโนมัติ** — ติ๊กคอลัมน์เกรดให้ครบก่อนเริ่มกรอก
+- **ป๊อปอัปลัด** — คลิกไอคอน Extension เพื่อเปิดหน้ากรอกเกรดได้โดยตรง
+- **แผงควบคุมลากได้** — ย้ายตำแหน่ง UI ได้ตามต้องการ
 
-- ✅ **Grade Entry**: Fill grades from clipboard, clear values, column detection
-- 🚧 **Student List**: Bulk student management (planned)
-- 🚧 **Reports**: Grade reports and export functionality (planned)
-- 🚧 **Settings**: Extension configuration (planned)
+---
 
-## 🛠 Development
+## วิธีติดตั้ง
 
-### Prerequisites
+### จาก Store (แนะนำ)
 
-- Node.js >= 16.0.0
-- npm or yarn
+- [Chrome Web Store](#) *(เร็วๆ นี้)*
+- [Firefox Add-ons](#) *(เร็วๆ นี้)*
 
-### Setup
+### Build เองจาก Source
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/grade-entry-helper.git
+git clone https://github.com/MasterMong/grade-entry-helper.git
 cd grade-entry-helper
-
-# Install dependencies
 npm install
-
-# Build the extension
 npm run build
-
-# For development with hot reload
-npm run build:dev --watch
 ```
 
-### Project Structure
+จากนั้นโหลด Extension:
+
+**Chrome / Edge**
+1. เปิด `chrome://extensions/`
+2. เปิด "Developer mode"
+3. คลิก "Load unpacked" แล้วเลือกโฟลเดอร์ `dist/`
+
+**Firefox**
+1. เปิด `about:debugging` → "This Firefox"
+2. คลิก "Load Temporary Add-on"
+3. เลือกไฟล์ใดก็ได้ในโฟลเดอร์ `dist/`
+
+---
+
+## วิธีใช้งาน
+
+1. เปิดหน้ากรอกเกรดใน SGS (หรือคลิกปุ่มลัดใน Popup)
+2. เลือกวิชาและกลุ่มเรียน
+3. คัดลอกข้อมูลเกรดจาก Google Sheets (Ctrl+C)
+4. คลิก "วางเกรด" ในแผงควบคุม
+5. ตรวจสอบเกรดแล้วกด Submit
+
+### รูปแบบข้อมูล
+
+**โหมดเรียงแถว** — ข้อมูล Tab-separated, แต่ละแถว = นักเรียน 1 คน, จำนวนคอลัมน์ต้องตรงกับคอลัมน์ที่เปิดอยู่ใน SGS
+
+**โหมดจับคู่รหัส** — คอลัมน์แรก = เลขประจำตัวนักเรียน (5 หลัก), คอลัมน์ถัดไป = เกรดแต่ละคอลัมน์
+
+---
+
+## โครงสร้างโปรเจกต์
 
 ```
 src/
-├── core/                          # Core extension system
-│   ├── ExtensionCore.js           # Main coordinator
-│   ├── SGSPageDetector.js         # Page detection
-│   └── BasePageController.js      # Base controller class
-├── shared/                        # Shared utilities
-│   ├── constants/                 # Configuration and constants
-│   ├── ui/                        # UI components
-│   └── utils/                     # Common utilities
-├── pages/                         # Page-specific features
-│   ├── gradeEntry/               # Grade entry functionality
-│   ├── studentList/              # Student management (planned)
-│   └── reports/                  # Reports (planned)
-└── content-scripts/              # Entry points
-    └── grade-entry.js
+├── core/                    # ระบบหลัก
+│   ├── ExtensionCore.js     # ตัวประสานงานหลัก
+│   ├── SGSPageDetector.js   # ตรวจจับประเภทหน้า
+│   └── BasePageController.js
+├── shared/                  # Utilities และ Constants
+│   ├── constants/           # Selectors, Messages, Config
+│   ├── ui/                  # NotificationManager, StyleManager
+│   └── utils/               # DOMUtils, SGSFormHandler
+├── pages/
+│   └── gradeEntry/          # ฟีเจอร์กรอกเกรด
+│       ├── GradeEntryController.js
+│       ├── GradeEntryUI.js
+│       ├── ColumnDetector.js
+│       ├── ClipboardHandler.js
+│       └── FieldUpdater.js
+└── content-scripts/
+    └── grade-entry.js       # Entry point
 ```
 
-### Build Commands
+---
+
+## คำสั่ง Build
 
 ```bash
-# Production build
-npm run build
-
-# Development build with source maps
-npm run build:dev
-
-# Watch mode for development
-npm run build:watch
-
-# Clean build artifacts
-npm run clean
-
-# Validate code and structure
-npm run validate
-
-# Run linter
-npm run lint
-npm run lint:fix
+npm run build          # Production build
+npm run build:dev      # Development build (with source maps)
+npm run build:watch    # Development build + auto-rebuild
+npm run clean          # ลบ build artifacts
+npm run validate       # ตรวจสอบโครงสร้างโค้ด
+npm run lint           # ตรวจสอบ code quality
+./release.sh           # Build + Pack ทั้ง Chrome และ Firefox
 ```
 
-## 📦 Installation
+---
 
-### From Source
+## Browser Compatibility
 
-1. Run `npm run build` to create the `dist/` folder
-2. Open Chrome/Edge extensions page (`chrome://extensions/`)
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the `dist/` folder
+| Browser | เวอร์ชัน | Manifest |
+|---------|---------|---------|
+| Chrome | >= 88 | V3 |
+| Edge | >= 88 | V3 |
+| Firefox | >= 78 | V2 (แปลงอัตโนมัติ) |
 
-### For Firefox
+---
 
-1. Build the extension with `npm run build`
-2. Go to `about:debugging`
-3. Click "This Firefox"
-4. Click "Load Temporary Add-on"
-5. Select any file in the `dist/` folder
+## การมีส่วนร่วม (Contributing)
 
-## 🎯 Usage
+ยินดีรับ Pull Request และ Issue จากทุกคน!
 
-1. **Navigate** to the SGS grade entry page
-2. **Select** subject and section from dropdowns
-3. **Copy** grade data from Google Sheets (Ctrl+C)
-4. **Click** "Fill from Clipboard" in the extension panel
-5. **Verify** the imported grades and submit
+### ขั้นตอนการ Contribute
 
-### Data Format
-
-The extension expects tab-separated data (Google Sheets format):
-- Each row represents one student
-- Columns should match the enabled grade columns in SGS
-- First row can contain headers (automatically detected)
-- Values should be numeric within the valid range for each column
-
-## 🏗 Architecture
-
-### Core Components
-
-- **ExtensionCore**: Main coordinator managing page detection and service initialization
-- **SGSPageDetector**: Intelligent page type detection and validation
-- **BasePageController**: Abstract base class for all page-specific controllers
-
-### Shared Services
-
-- **NotificationManager**: Consistent user notifications
-- **StyleManager**: CSS management and theming
-- **DOMUtils**: Common DOM manipulation utilities
-- **SGSFormHandler**: ASP.NET postback handling
-
-### Grade Entry Features
-
-- **ColumnDetector**: Dynamic grade column detection
-- **ClipboardHandler**: Data parsing and validation
-- **FieldUpdater**: Grade field updates with validation
-- **GradeEntryUI**: User interface components
-
-## 🧪 Testing
-
+**1. Fork และ Clone**
 ```bash
-# Run validation checks
-npm run validate
-
-# Check build output
-npm run build && ls -la dist/
-
-# Manual testing
-npm run build:dev
-# Load extension in browser and test functionality
+git clone https://github.com/<your-username>/grade-entry-helper.git
+cd grade-entry-helper
+npm install
 ```
 
-## 🔧 Configuration
+**2. สร้าง Branch ใหม่**
 
-Extension behavior can be configured in `src/shared/constants/Config.js`:
-
-- Feature flags per page type
-- UI positioning and styling
-- Performance settings
-- Validation rules
-
-## 🚀 Deployment
-
-### Development Release
-
+ตั้งชื่อ Branch ให้สื่อความหมาย:
 ```bash
-npm run build:dev
-# Load dist/ folder in browser for testing
+git checkout -b feature/ชื่อฟีเจอร์
+# หรือ
+git checkout -b fix/ชื่อบั๊กที่แก้
 ```
 
-### Production Release
-
+**3. เขียนโค้ดและทดสอบ**
 ```bash
-npm run clean
-npm run validate
-npm run lint
-npm run build
-# Upload dist/ folder to extension store
+npm run build:watch    # เปิด watch mode ระหว่างพัฒนา
+npm run validate       # ตรวจสอบโครงสร้าง
+npm run lint           # ตรวจสอบ code style
 ```
 
-## 📄 Browser Compatibility
+โหลด Extension จากโฟลเดอร์ `dist/` ในเบราว์เซอร์เพื่อทดสอบจริง
 
-- Chrome >= 88 (Manifest V3)
-- Edge >= 88 (Manifest V3)
-- Firefox >= 78 (with Manifest V2 compatibility)
+**4. Commit**
 
-## 🤝 Contributing
+ใช้รูปแบบ [Conventional Commits](https://www.conventionalcommits.org/):
+```
+feat: เพิ่มฟีเจอร์ใหม่
+fix: แก้ไขบั๊ก
+docs: อัปเดตเอกสาร
+refactor: ปรับโครงสร้างโค้ด
+```
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes following the existing code style
-4. Run validation: `npm run validate && npm run lint`
-5. Test your changes thoroughly
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
+**5. Push และเปิด Pull Request**
+```bash
+git push origin feature/ชื่อฟีเจอร์
+```
 
-## 📜 License
+จากนั้นไปที่ [GitHub](https://github.com/MasterMong/grade-entry-helper) แล้วคลิก "Compare & pull request"
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+ในคำอธิบาย PR ระบุ:
+- สิ่งที่เปลี่ยนแปลง
+- วิธีทดสอบ
+- Screenshot (ถ้ามี)
 
-## 🙏 Acknowledgments
+### แนวทางการเขียนโค้ด
 
-- SGS System compatibility
-- Google Sheets integration patterns
-- Modern browser extension best practices
+- ใช้ ES6+ modules (ไม่ใช้ CommonJS)
+- ห้าม inject inline script — SGS CSP บล็อก (ใช้ background.js แทน)
+- ข้อความที่แสดงผู้ใช้ต้องอยู่ใน `src/shared/constants/Messages.js` เท่านั้น
+- DOM selectors อยู่ใน `src/shared/constants/SGSSelectors.js`
+- อ่าน `CLAUDE.md` เพื่อทำความเข้าใจ Architecture ก่อน
+
+### รายงานบั๊ก
+
+เปิด [Issue](https://github.com/MasterMong/grade-entry-helper/issues) พร้อมระบุ:
+- เบราว์เซอร์และเวอร์ชัน
+- ขั้นตอนที่ทำให้เกิดบั๊ก
+- สิ่งที่คาดหวัง vs สิ่งที่เกิดขึ้นจริง
+- Screenshot หรือ Console error (ถ้ามี)
+
+---
+
+## License
+
+MIT License — ดูรายละเอียดใน [LICENSE](LICENSE)
+
+---
+
+พัฒนาโดย [ครูมงคล](https://mongkon.ch) · [mongkon.org@gmail.com](mailto:mongkon.org@gmail.com)
