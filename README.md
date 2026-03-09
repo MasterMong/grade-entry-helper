@@ -26,7 +26,7 @@ Extension สำหรับ Chrome / Edge / Firefox ช่วยกรอกเ
 ### Build เองจาก Source
 
 ```bash
-git clone https://github.com/MasterMong/grade-entry-helper.git
+git clone https://github.com/MasterMong/sgs-bot-grade.git
 cd grade-entry-helper
 npm install
 npm run build
@@ -119,7 +119,7 @@ npm run lint           # ตรวจสอบ code quality
 
 **1. Fork และ Clone**
 ```bash
-git clone https://github.com/MasterMong/grade-entry-helper.git
+git clone https://github.com/MasterMong/sgs-bot-grade.git
 cd grade-entry-helper
 npm install
 ```
@@ -157,7 +157,7 @@ refactor: ปรับโครงสร้างโค้ด
 git push origin feature/ชื่อฟีเจอร์
 ```
 
-จากนั้นไปที่ [GitHub](https://github.com/MasterMong/grade-entry-helper) แล้วคลิก "Compare & pull request"
+จากนั้นไปที่ [GitHub](https://github.com/MasterMong/sgs-bot-grade) แล้วคลิก "Compare & pull request"
 
 ในคำอธิบาย PR ระบุ:
 - สิ่งที่เปลี่ยนแปลง
@@ -174,7 +174,7 @@ git push origin feature/ชื่อฟีเจอร์
 
 ### รายงานบั๊ก
 
-เปิด [Issue](https://github.com/MasterMong/grade-entry-helper/issues) พร้อมระบุ:
+เปิด [Issue](https://github.com/MasterMong/sgs-bot-grade/issues) พร้อมระบุ:
 - เบราว์เซอร์และเวอร์ชัน
 - ขั้นตอนที่ทำให้เกิดบั๊ก
 - สิ่งที่คาดหวัง vs สิ่งที่เกิดขึ้นจริง

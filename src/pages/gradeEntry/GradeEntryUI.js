@@ -155,7 +155,16 @@ export class GradeEntryUI {
     // Create status indicator
     this.statusDiv = this.createStatusIndicator();
 
-    // Create dev credit
+    // Create footer row with dev credit and report link
+    const footerRow = DOMUtils.createElement('div', {
+        style: `
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2px;
+        `
+    });
+
     const devCredit = DOMUtils.createElement('a', {
         textContent: MESSAGES.ui.labels.devCredit,
         attributes: {
@@ -166,17 +175,30 @@ export class GradeEntryUI {
         style: `
             font-size: 10px;
             color: #999;
-            text-align: center;
-            margin-top: 2px;
             text-decoration: none;
         `
     });
-    devCredit.addEventListener('mouseenter', () => {
-        devCredit.style.textDecoration = 'underline';
+    devCredit.addEventListener('mouseenter', () => { devCredit.style.textDecoration = 'underline'; });
+    devCredit.addEventListener('mouseleave', () => { devCredit.style.textDecoration = 'none'; });
+
+    const reportLink = DOMUtils.createElement('a', {
+        textContent: '🐛 แจ้งปัญหา',
+        attributes: {
+            href: 'https://github.com/MasterMong/sgs-bot-grade/issues',
+            target: '_blank',
+            rel: 'noopener noreferrer'
+        },
+        style: `
+            font-size: 10px;
+            color: #999;
+            text-decoration: none;
+        `
     });
-    devCredit.addEventListener('mouseleave', () => {
-        devCredit.style.textDecoration = 'none';
-    });
+    reportLink.addEventListener('mouseenter', () => { reportLink.style.color = '#e53935'; reportLink.style.textDecoration = 'underline'; });
+    reportLink.addEventListener('mouseleave', () => { reportLink.style.color = '#999'; reportLink.style.textDecoration = 'none'; });
+
+    footerRow.appendChild(devCredit);
+    footerRow.appendChild(reportLink);
 
     // Assemble panel
     this.panel.appendChild(minimizeButton);
@@ -192,7 +214,7 @@ export class GradeEntryUI {
     this.panel.appendChild(rowControl);
     this.panel.appendChild(this.progressDiv);
     this.panel.appendChild(this.statusDiv);
-    this.panel.appendChild(devCredit);
+    this.panel.appendChild(footerRow);
     
     // Add to document
     document.body.appendChild(this.panel);

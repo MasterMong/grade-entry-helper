@@ -40,4 +40,10 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.tabs.create({ url: 'https://mongkon.ch/tools/sgs' });
     window.close();
   });
+
+  // Report problem button
+  document.getElementById('reportProblem')?.addEventListener('click', () => {
+    chrome.tabs.create({ url: 'https://github.com/MasterMong/sgs-bot-grade/issues' });
+    window.close();
+  });
 });

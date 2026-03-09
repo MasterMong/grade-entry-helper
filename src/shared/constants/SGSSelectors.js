@@ -63,7 +63,7 @@ export const SGS_PATTERNS = {
     },
 
     // Fields to skip during processing (read-only computed columns on all pages)
-    skipFields: ['TotalPercent', 'Gr', 'ScoreFinal', 'ScoreTotal', 'Midterm']
+    skipFields: ['TotalPercent', 'Gr', 'ScoreTotal']
   },
   
   // Navigation pages for grade entry variants
